@@ -7,11 +7,19 @@ import {
   Sparkles,
   Loader2
 } from 'lucide-react';
+import { BusinessProfile } from './types/business';
 import { 
   generateMonthlyNarrative, 
   DashboardContextData, 
   ReportDraft 
 } from './lib/gemini';
+
+const CURRENT_BUSINESS: BusinessProfile = {
+  name: 'Digital Insights Pro',
+  industry: 'saas',
+  primaryGoal: 'Scale Monthly Recurring Revenue with 4.0x LTV:CAC efficiency',
+  persona: 'analytical'
+};
 
 const MOCK_DRAFT: ReportDraft = {
   month: 'April 2026',
@@ -64,10 +72,12 @@ export default function DraftReportView() {
 
     const contextData: DashboardContextData = {
       month: 'April 2026',
-      totalRevenue: 'IDR 1.16B',
-      totalSpend: 'IDR 30.1M',
-      blendedRoas: '38.5x',
-      metaFunnelDropoff: true,
+      metrics: {
+        'Total Revenue': 'IDR 1.16B',
+        'Total Spend': 'IDR 30.1M',
+        'Blended ROAS': '38.5x',
+        'Meta Funnel Alert': 'Pixel integration failing'
+      },
       topChannels: ['Meta Ads', 'Google P-Max', 'YouTube Demand Gen'],
       keyHighlights: [
         'Website bookings recovering to 15.7%',
@@ -80,13 +90,14 @@ export default function DraftReportView() {
       contextData.keyHighlights.push(`[USER REFINEMENT REQUEST: ${refinementNote}]`);
     }
 
-    // Call the AI engine (Swap empty string for your actual import.meta.env.VITE_GEMINI_API_KEY when running locally)
-    const newDraft = await generateMonthlyNarrative(contextData, '');
+    // Call the AI engine
+    const newDraft = await generateMonthlyNarrative(CURRENT_BUSINESS, contextData, '');
     
     setDraft(newDraft);
     setIsGenerating(false);
     setCustomPrompt('');
   };
+
 
   const handleInlineRefine = (heading: string) => {
     setCustomPrompt(`Rewrite the [${heading}] section to be more...`);

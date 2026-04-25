@@ -1,3 +1,5 @@
+import { BusinessProfile } from '../types/business';
+
 export interface ReportSection {
   id: string;
   type: 'title' | 'summary' | 'insight' | 'action';
@@ -14,12 +16,10 @@ export interface ReportDraft {
 
 export interface DashboardContextData {
   month: string;
-  totalRevenue: string;
-  totalSpend: string;
-  blendedRoas: string;
-  metaFunnelDropoff: boolean;
+  metrics: Record<string, string>;
   topChannels: string[];
   keyHighlights: string[];
+  issues?: string[];
 }
 
 /**
@@ -32,10 +32,12 @@ function stripMarkdownFormatting(text: string): string {
 /**
  * Generates an executive narrative draft using the Gemini API based on marketing context data.
  * 
+ * @param business The business profile (name, industry, goals, persona).
  * @param data The raw analytics data to feed into the prompt context.
- * @param apiKey The user's Gemini API key (defaults to VITE_GEMINI_API_KEY if not passed).
+ * @param apiKey The user's Gemini API key.
  */
 export async function generateMonthlyNarrative(
+  business: BusinessProfile,
   data: DashboardContextData, 
   apiKey?: string
 ): Promise<ReportDraft> {
@@ -43,22 +45,30 @@ export async function generateMonthlyNarrative(
   
   if (!key) {
     console.error('Gemini API key is missing.');
-    return getFallbackDraft(data.month, 'No API key provided. Please configure your Gemini API Key environments variable.');
+    return getFallbackDraft(data.month, 'No API key provided.');
   }
 
+  const metricSummary = Object.entries(data.metrics)
+    .map(([key, val]) => `- ${key}: ${val}`)
+    .join('\n');
+
   const prompt = `
-You are an expert Chief Marketing Officer for Mari Beach Club, a premium beachfront venue in Bali.
-Analyze the provided raw metrics and generate an executive brief for the executive team.
+You are a fractional CMO for ${business.name}, operating in the ${business.industry} industry. 
+Their primary business goal is: ${business.primaryGoal}.
+Your executive persona is: ${business.persona} (maintain this tone throughout).
 
-Here is the raw data for the month of ${data.month}:
-- Total Revenue: ${data.totalRevenue}
-- Total Ad Spend: ${data.totalSpend}
-- Blended ROAS: ${data.blendedRoas}
+Analyze the provided raw marketing metrics and generate a high-level executive report for ${data.month}.
+Match your tone to a professional C-suite advisor who is ${business.persona}.
+
+Raw Context:
+${metricSummary}
+
+Market Performance:
 - Top Channels: ${data.topChannels.join(', ')}
-- Meta Funnel Issue: ${data.metaFunnelDropoff ? 'Yes, there is a massive drop-off at the Initiate Checkout step due to failed TableCheck pixel integration.' : 'No active funnel tracking issues.'}
-- Key Highlights: ${data.keyHighlights.join(', ')}
+- Strategic Insights: ${data.keyHighlights.join(', ')}
+- Barriers: ${data.issues?.join(', ') || 'None reported'}
 
-You must return ONLY valid JSON matching this exact schema:
+Return valid JSON:
 {
   "sections": [
     {
@@ -70,53 +80,35 @@ You must return ONLY valid JSON matching this exact schema:
   ]
 }
 
-Instructions:
-1. Provide a 'title' section first with a catchy but professional, context-aware heading. 
-2. Follow up with a 'summary' section summarizing the overall blended ROAS and revenue against ad spend.
-3. Add 1-2 'insight' sections digging into the channel highlights and specifically bringing attention to the Meta Funnel issue if present.
-4. End with an 'action' section prescribing 3 concrete next steps.
-5. Do not wrap the JSON in markdown blocks like \`\`\`json. Return raw JSON.
+Guidelines:
+1. 'title': Contextually aware heading reflecting the ${business.industry} landscape.
+2. 'summary': Performance vs goals using the ${business.persona} tone.
+3. 'insight': Actionable "Why" behind the data.
+4. 'action': 3-4 tactical next steps for their team.
 `;
 
   try {
-    // Explicitly targeting gemini-1.5-flash which is much faster and reliable for structured/JSON output 
-    // while still keeping the simple REST format.
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
             responseMimeType: "application/json",
           }
         }),
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
-    }
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
 
     const responseData = await response.json();
     const rawText = responseData?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!rawText) {
-      throw new Error('Received empty or malformed response from Gemini API.');
-    }
-
     const cleanJsonString = stripMarkdownFormatting(rawText);
     const parsedObj = JSON.parse(cleanJsonString);
-
-    if (!parsedObj || !Array.isArray(parsedObj.sections)) {
-      throw new Error('Parsed successful but response did not contain a valid sections array.');
-    }
 
     return {
       month: data.month,
@@ -126,32 +118,122 @@ Instructions:
     };
 
   } catch (error: any) {
-    console.error('Failed to generate narrative with Gemini:', error);
-    return getFallbackDraft(data.month, error.message || 'The AI engine encountered an error generating the narrative. Please try again or check your API key.');
+    return getFallbackDraft(data.month, error.message);
   }
 }
 
-/**
- * Returns a graceful fallback draft when the AI generation fails.
- */
 function getFallbackDraft(month: string, errorMessage: string): ReportDraft {
   return {
     month,
     status: 'Draft Ready',
     lastUpdated: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     sections: [
-      {
-        id: 'error-1',
-        type: 'title',
-        heading: `${month} Performance Draft`,
-        content: `Error state rendering for ${month}`
-      },
-      {
-        id: 'error-2',
-        type: 'summary',
-        heading: 'Generation Failed',
-        content: `The AI engine encountered an error generating the narrative. Details: ${errorMessage}`
-      }
+      { id: '1', type: 'title', heading: 'Performance Update', content: '' },
+      { id: '2', type: 'summary', heading: 'Insight Retrieval Error', content: errorMessage }
     ]
   };
 }
+
+/**
+ * Analyzes a user's natural language query against the current dashboard context.
+ */
+export async function analyzeDashboardQuery(
+  userQuery: string,
+  dashboardContext: any,
+  apiKey?: string
+): Promise<string> {
+  const key = apiKey || import.meta.env.VITE_GEMINI_API_KEY;
+  
+  if (!key) {
+    return "AI Analyst is currently offline. Please configure your API key.";
+  }
+
+  const prompt = `
+You are a Senior SaaS Data Analyst. Your goal is to help users understand their marketing performance data.
+You have access to the following JSON context representing the current dashboard view:
+${JSON.stringify(dashboardContext, null, 2)}
+
+User Question: "${userQuery}"
+
+Instructions:
+1. Base your answer ONLY on the provided JSON data.
+2. If the data required to answer the question is missing, state that clearly.
+3. Use professional, clinical, and data-driven language.
+4. Format your response with Markdown (use bolding for emphasis, bullet points for lists, and tables where appropriate).
+5. Be concise but insightful.
+6. The user is an executive; focus on ROI, efficiency, and scale.
+`;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.2, // Low temperature for factual analysis
+            topK: 40,
+            topP: 0.95,
+          }
+        }),
+      }
+    );
+
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+
+    const data = await response.json();
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || "I was unable to analyze this data point.";
+  } catch (error) {
+    console.error('AI Analyst Error:', error);
+    return "The analyst encountered an engine error while processing your request.";
+  }
+}
+
+/**
+ * Scans the provided data for performance anomalies or red flags.
+ */
+export async function detectAnomalies(
+  dashboardContext: any,
+  apiKey?: string
+): Promise<string[]> {
+  const key = apiKey || import.meta.env.VITE_GEMINI_API_KEY;
+  if (!key) return [];
+
+  const prompt = `
+Scan the following marketing data for performance anomalies, cost spikes, or efficiency drops:
+${JSON.stringify(dashboardContext, null, 2)}
+
+Identify any "Red Flags" (e.g., spend up while conversions down) or "Golden Opportunities" (e.g., channel X peaking with high ROAS).
+
+Return ONLY a JSON array of strings, where each string is a concise alert.
+Format: ["Alert 1", "Alert 2"]
+`;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+          }
+        }),
+      }
+    );
+
+    if (!response.ok) return [];
+    const data = await response.json();
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) return [];
+    
+    return JSON.parse(rawText);
+  } catch (error) {
+    return [];
+  }
+}
+

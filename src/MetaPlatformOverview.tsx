@@ -138,8 +138,14 @@ const getIcon = (iconName: string) => {
   }
 };
 
-export default function MetaPlatformOverview() {
+export default function MetaPlatformOverview({ onDataLoaded }: { onDataLoaded?: (data: any) => void }) {
   const { data, isLoading, error } = useDashboardData<MetaDashboardPayload>('meta', MOCK_FALLBACK_DATA_META);
+
+  React.useEffect(() => {
+    if (data && onDataLoaded) {
+      onDataLoaded(data);
+    }
+  }, [data, onDataLoaded]);
 
   const kpis = Array.isArray(data?.kpis) ? data.kpis : [];
   const timeSeries = Array.isArray(data?.timeSeries) ? data.timeSeries : [];
