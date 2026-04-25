@@ -12,7 +12,8 @@ import { fetchPlatformData } from '../utils/api';
  */
 export function useDashboardData<T>(
   platform: 'ga4' | 'gsc' | 'youtube' | 'meta' | 'tiktok' | 'email' | 'executive',
-  mockFallbackData: T
+  mockFallbackData: T,
+  dateRange?: { startDate: string; endDate: string }
 ) {
   // Use the generic type T to ensure our component UI stays strictly typed
   const [data, setData] = useState<T | null>(null);
@@ -31,7 +32,8 @@ export function useDashboardData<T>(
 
       try {
         // Attempt to fetch live data from the internal GAS bridge
-        const fetchedResult = await fetchPlatformData(platform);
+        // Passing date parameters to the API utility
+        const fetchedResult = await fetchPlatformData(platform, dateRange);
         
         if (isMounted) {
           // If successful, cast and set the live data
@@ -63,7 +65,7 @@ export function useDashboardData<T>(
     return () => {
       isMounted = false;
     };
-  }, [platform, mockFallbackData]);
+  }, [platform, mockFallbackData, dateRange?.startDate, dateRange?.endDate]);
 
   return { data, isLoading, error, isLive };
 }

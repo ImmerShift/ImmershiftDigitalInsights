@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Building2, Calendar, ChevronDown, AlertTriangle, Zap, Activity, Info, Sparkles, TrendingUp, TrendingDown, RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useDashboardData } from './hooks/useDashboardData';
+import { DateRange } from './components/dashboard/GlobalDateRangePicker';
 import { BusinessProfile } from './types/business';
 import { getKpiMapping } from './utils/kpiMapping';
 import { KpiCard } from './components/dashboard/KpiCard';
@@ -72,8 +73,14 @@ const MOCK_FALLBACK_DATA_EXECUTIVE: ExecutiveDashboardPayload = {
   ]
 };
 
-export default function ExecutiveOverview({ onDataLoaded }: { onDataLoaded?: (data: any) => void }) {
-  const { data, isLoading, error } = useDashboardData<ExecutiveDashboardPayload>('executive', MOCK_FALLBACK_DATA_EXECUTIVE);
+export default function DigitalOverview({ 
+  onDataLoaded, 
+  dateRange 
+}: { 
+  onDataLoaded?: (data: any) => void,
+  dateRange: DateRange
+}) {
+  const { data, isLoading, error } = useDashboardData<ExecutiveDashboardPayload>('executive', MOCK_FALLBACK_DATA_EXECUTIVE, dateRange);
   const kpiLabels = getKpiMapping(CURRENT_BUSINESS.industry);
   const [forecast, setForecast] = useState<PredictiveForecast | null>(null);
   const [holisticInsight, setHolisticInsight] = useState<string>('');
@@ -122,7 +129,7 @@ export default function ExecutiveOverview({ onDataLoaded }: { onDataLoaded?: (da
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-[#EAE3D9] pb-6 gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-               <h1 className="text-3xl font-serif font-bold text-[#3E1510]">Digital Command Center</h1>
+               <h1 className="text-3xl font-serif font-bold text-[#3E1510]">Digital Overview</h1>
                <AnimatePresence>
                  {anomaly && (
                    <motion.div 

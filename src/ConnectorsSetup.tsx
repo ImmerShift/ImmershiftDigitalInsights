@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BarChart3,
   Search,
@@ -10,8 +10,13 @@ import {
   ArrowLeft,
   Loader2,
   X,
-  AlertCircle
+  AlertCircle,
+  Link2
 } from 'lucide-react';
+
+import { db, auth } from './lib/firebase';
+import { collection, addDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { handleFirestoreError, OperationType } from './utils/firebaseErrors';
 
 export interface Platform {
   id: string;
@@ -135,41 +140,130 @@ const MOCK_SUB_ACCOUNTS: Record<string, { name: string; id: string }[]> = {
 
 export default function ConnectorsSetup() {
   const [currentView, setCurrentView] = useState<'active' | 'marketplace'>('active');
-  const [activeConnections, setActiveConnections] = useState<ConnectedAccount[]>(INITIAL_CONNECTIONS);
+  const [activeConnections, setActiveConnections] = useState<ConnectedAccount[]>([]);
+  const [loadingConnections, setLoadingConnections] = useState(true);
+
+  // Sync connections from Firestore
+  useEffect(() => {
+    if (!auth.currentUser) return;
+    const path = `users/${auth.currentUser.uid}/connectors`;
+    const unsubscribe = onSnapshot(collection(db, path), (snapshot) => {
+      const connections = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as ConnectedAccount[];
+      setActiveConnections(connections);
+      setLoadingConnections(false);
+    }, (err) => {
+      handleFirestoreError(err, OperationType.LIST, path);
+    });
+    return () => unsubscribe();
+  }, []);
   const [authenticatingPlatform, setAuthenticatingPlatform] = useState<string | null>(null);
   const [accountSelectionModal, setAccountSelectionModal] = useState<string | null>(null);
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
-  const handleConnect = (platformId: string) => {
+  const handleConnect = async (platformId: string) => {
     setAuthenticatingPlatform(platformId);
-    setTimeout(() => {
+    
+    // Map internal platform IDs to backend names
+    const platformMap: Record<string, string> = {
+      ga4: 'google',
+      google_ads: 'google',
+      search_console: 'google',
+      meta_ads: 'meta',
+    };
+
+    const backendPlatform = platformMap[platformId] || platformId;
+
+    try {
+      // 1. Fetch OAuth URL from backend
+      const response = await fetch(`/api/auth/${backendPlatform}/url`);
+      const { url } = await response.json();
+
+      // 2. Open Popup
+      const width = 600;
+      const height = 700;
+      const left = window.screenX + (window.innerWidth - width) / 2;
+      const top = window.screenY + (window.innerHeight - height) / 2;
+      
+      const popup = window.open(
+        url,
+        `Connect to ${platformId}`,
+        `width=${width},height=${height},left=${left},top=${top},status=no,menubar=no,toolbar=no`
+      );
+
+      if (!popup) {
+        throw new Error('Popup blocked. Please enable popups for this site.');
+      }
+
+      // 3. Listen for success message from callback window
+      const handleMessage = (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        
+        if (event.data.type === 'OAUTH_SUCCESS' && event.data.platform === backendPlatform) {
+          window.removeEventListener('message', handleMessage);
+          setAuthenticatingPlatform(null);
+          setAccountSelectionModal(platformId);
+          setSelectedAccounts([]);
+        }
+      };
+
+      window.addEventListener('message', handleMessage);
+
+      // Failsafe: check if popup is closed manually
+      const checkPopup = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(checkPopup);
+          window.removeEventListener('message', handleMessage);
+          setAuthenticatingPlatform(null);
+        }
+      }, 1000);
+
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || 'OAuth Initiation Failed');
       setAuthenticatingPlatform(null);
-      setAccountSelectionModal(platformId);
-      setSelectedAccounts([]);
-    }, 1500);
+    }
   };
 
-  const handleSaveAccounts = () => {
-    if (!accountSelectionModal) return;
+  const handleSaveAccounts = async () => {
+    if (!accountSelectionModal || !auth.currentUser) return;
 
     const platform = AVAILABLE_PLATFORMS.find(p => p.id === accountSelectionModal);
     const subAccounts = MOCK_SUB_ACCOUNTS[accountSelectionModal] || [{ name: 'Default Account', id: 'default-123' }];
     
-    const newConnections: ConnectedAccount[] = selectedAccounts.map(accId => {
-      const accDetails = subAccounts.find(a => a.id === accId);
-      return {
-        id: Math.random().toString(36).substr(2, 9),
-        platformId: accountSelectionModal,
-        accountName: accDetails ? accDetails.name : 'Unknown Account',
-        accountId: accId,
-        connectedAt: new Date().toISOString(),
-        status: 'active'
-      };
-    });
+    try {
+      const newConnections: ConnectedAccount[] = await Promise.all(selectedAccounts.map(async accId => {
+        const accDetails = subAccounts.find(a => a.id === accId);
+        const data = {
+          platformId: accountSelectionModal,
+          accountName: accDetails ? accDetails.name : 'Unknown Account',
+          accountId: accId,
+          accessToken: 'MOCK_TOKEN_' + Math.random().toString(36).substring(7),
+          connectedAt: new Date().toISOString(),
+          status: 'active'
+        };
 
-    setActiveConnections(prev => [...prev, ...newConnections]);
-    setAccountSelectionModal(null);
-    setCurrentView('active');
+        const path = `users/${auth.currentUser?.uid}/connectors`;
+        try {
+          await addDoc(collection(db, path), data);
+        } catch (err) {
+          handleFirestoreError(err, OperationType.CREATE, path);
+        }
+
+        return {
+          id: Math.random().toString(36).substr(2, 9),
+          ...data
+        } as ConnectedAccount;
+      }));
+
+      setActiveConnections(prev => [...prev, ...newConnections]);
+      setAccountSelectionModal(null);
+      setCurrentView('active');
+    } catch (err) {
+      console.error("Failed to save accounts:", err);
+    }
   };
 
   const currentPlatformDetails = AVAILABLE_PLATFORMS.find(p => p.id === accountSelectionModal);
@@ -230,7 +324,14 @@ export default function ConnectorsSetup() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EAE3D9]">
-                  {activeConnections.length === 0 ? (
+                  {loadingConnections ? (
+                    <tr>
+                      <td colSpan={5} className="py-20 text-center">
+                         <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#7A2B20] opacity-20" />
+                         <p className="text-[10px] uppercase font-black tracking-widest text-[#A88C87] mt-4">Streaming Connections...</p>
+                      </td>
+                    </tr>
+                  ) : activeConnections.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="py-12 text-center text-[#5C4541] bg-white">
                         <div className="flex flex-col items-center gap-3">
@@ -320,19 +421,23 @@ export default function ConnectorsSetup() {
                     {platforms.map(platform => {
                       const Icon = platform.icon;
                       return (
-                        <div key={platform.id} className="bg-white border text-left border-[#EAE3D9] rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full hover:border-[#DDA77B]/50 group">
-                          <div className="w-12 h-12 rounded-xl bg-gray-50 text-gray-700 flex items-center justify-center font-bold text-xl overflow-hidden shrink-0 mb-4 group-hover:scale-105 transition-transform duration-300">
-                              {platform.id === 'meta_ads' ? 'f' : 
-                               platform.id === 'google_ads' || platform.id === 'ga4' || platform.id === 'search_console' ? 'G' : 
-                               <Icon size={24} />}
+                        <div key={platform.id} className="bg-white border text-left border-[#EAE3D9] rounded-[2rem] p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all flex flex-col h-full hover:border-brand-primary group">
+                          <div className="flex justify-between items-start mb-6">
+                            <div className="w-14 h-14 rounded-2xl bg-[#F9F7F4] text-gray-700 flex items-center justify-center font-bold text-2xl overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-300">
+                                {platform.id === 'meta_ads' ? 'f' : 
+                                 platform.id === 'google_ads' || platform.id === 'ga4' || platform.id === 'search_console' ? 'G' : 
+                                 <Icon size={24} />}
+                            </div>
+                            <div className="px-2 py-1 bg-[#FDF8F3] border border-[#F5E1C8] rounded-md text-[8px] font-black uppercase text-[#DDA77B]">API v2.0</div>
                           </div>
-                          <h3 className="font-bold text-lg mb-2 text-[#3E1510] group-hover:text-[#7A2B20] transition-colors">{platform.name}</h3>
-                          <p className="text-[#5C4541] text-sm flex-grow mb-6 leading-relaxed">{platform.description}</p>
+                          <h3 className="font-serif font-black text-xl mb-3 text-[#3E1510] group-hover:text-brand-primary transition-colors">{platform.name}</h3>
+                          <p className="text-[#5C4541] text-sm flex-grow mb-8 leading-relaxed opacity-80">{platform.description}</p>
                           <button
                             onClick={() => handleConnect(platform.id)}
-                            className="w-full py-2.5 rounded-xl text-sm font-semibold text-[#3E1510] border-2 border-[#EAE3D9] hover:border-[#7A2B20] hover:text-[#7A2B20] transition-all bg-white"
+                            className="w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-white bg-[#3E1510] hover:bg-brand-primary transition-all flex items-center justify-center gap-2 group/btn"
                           >
-                            Connect
+                            <Link2 size={16} className="group-hover/btn:rotate-45 transition-transform" />
+                            Connect Account
                           </button>
                         </div>
                       );

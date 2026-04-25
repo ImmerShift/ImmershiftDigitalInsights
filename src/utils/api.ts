@@ -6,10 +6,17 @@ const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzz2UV_EPrpFUKl
  * @param platform The marketing platform to fetch data for.
  * @returns Parsed JSON data from the Google Apps Script.
  */
-export async function fetchPlatformData(platform: 'ga4' | 'gsc' | 'youtube' | 'meta' | 'tiktok' | 'email' | 'executive') {
+export async function fetchPlatformData(
+  platform: 'ga4' | 'gsc' | 'youtube' | 'meta' | 'tiktok' | 'email' | 'executive',
+  dateRange?: { startDate: string; endDate: string }
+) {
   try {
     // Construct the URL with the platform query parameter for the Apps Script routing
-    const url = `${GAS_WEB_APP_URL}?platform=${platform}`;
+    let url = `${GAS_WEB_APP_URL}?platform=${platform}`;
+    
+    if (dateRange) {
+      url += `&startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`;
+    }
     
     // Google Apps Script requires following redirects to handle CORS properly.
     // Using a simple GET request avoids preflight OPTIONS requests which GAS often fails on.

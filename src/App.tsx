@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, sendEmailVerification } from 'firebase/auth';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { auth, db } from './lib/firebase';
 import ConnectorsSetup from './ConnectorsSetup';
 import GscPlatformOverview from './GscPlatformOverview';
 import YoutubePlatformOverview from './YoutubePlatformOverview';
 import MetaPlatformOverview from './MetaPlatformOverview';
-import ExecutiveOverview from './ExecutiveOverview';
+import DigitalOverview from './DigitalOverview';
 import DraftReportView from './DraftReportView';
 import EmailPlatformOverview from './EmailPlatformOverview';
 import TiktokPlatformOverview from './TiktokPlatformOverview';
@@ -17,137 +20,210 @@ import { SalesCycleView } from './components/dashboard/SalesCycleView';
 import { CustomInsightsBuilder } from './components/dashboard/CustomInsightsBuilder';
 import { CommandCenter } from './components/dashboard/CommandCenter';
 import { AiAnalystSidebar } from './components/dashboard/AiAnalystSidebar';
-import { MessageSquare, Sparkles, Landmark, LayoutTemplate } from 'lucide-react';
-
-type ViewType = 'connectors' | 'gsc' | 'youtube' | 'meta' | 'executive' | 'draft' | 'email' | 'tiktok' | 'ga4' | 'revenue-sync' | 'scratchpad';
+import { Sidebar, ViewType } from './components/layout/Sidebar';
+import { ProfileSettings } from './components/settings/ProfileSettings';
+import { GlobalDateRangePicker, DateRange } from './components/dashboard/GlobalDateRangePicker';
+import { Login } from './components/auth/Login';
+import { Register } from './components/auth/Register';
+import { MessageSquare, Sparkles } from 'lucide-react';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('executive');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeContext, setActiveContext] = useState<any>(null);
   const [language, setLanguage] = useState<'en' | 'id'>('en');
+  const [user, setUser] = useState<any>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authView, setAuthView] = useState<'login' | 'register'>('login');
+  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [dateRange, setDateRange] = useState<DateRange>({ 
+    label: 'Last 14 Days', 
+    startDate: '2026-04-11', 
+    endDate: '2026-04-25' 
+  });
 
-  // This function allows child views to register their data context for the AI Analyst
+  // Auth Listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        setUser(firebaseUser);
+        // Sync logo from Firestore
+        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+        if (userDoc.exists()) {
+          setLogoUrl(userDoc.data().logoUrl || '');
+        }
+      } else {
+        setUser(null);
+        setLogoUrl('');
+      }
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: string, p: string) => {
+    try {
+      await signInWithEmailAndPassword(auth, e, p);
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  const handleRegister = async (e: string, p: string, n: string) => {
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, e, p);
+      await updateProfile(cred.user, { displayName: n });
+      await sendEmailVerification(cred.user);
+      
+      // Initialize firestore doc
+      await setDoc(doc(db, 'users', cred.user.uid), {
+        email: e,
+        displayName: n,
+        createdAt: new Date().toISOString(), // This will be validated by rules as request.time
+        logoUrl: ''
+      });
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(auth, provider);
+      
+      // Check if doc exists
+      const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, 'users', cred.user.uid), {
+          email: cred.user.email,
+          displayName: cred.user.displayName,
+          createdAt: new Date().toISOString(),
+          logoUrl: ''
+        });
+      }
+    } catch (err: any) {
+      console.error(err);
+    }
+  };
+
+  const handleLogout = () => {
+    signOut(auth);
+  };
+
+  const handleUpdateLogo = async (url: string) => {
+    if (!user) return;
+    try {
+      await setDoc(doc(db, 'users', user.uid), { 
+        logoUrl: url,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+      setLogoUrl(url);
+    } catch (err) {
+      console.error("Failed to update logo:", err);
+    }
+  };
+
   const handleContextUpdate = (data: any) => {
     setActiveContext(data);
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#F9F7F4] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-[#7A2B20]/20 border-t-[#7A2B20] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return authView === 'login' ? (
+      <Login onLogin={handleLogin} onSwitchToRegister={() => setAuthView('register')} onGoogleLogin={handleGoogleLogin} />
+    ) : (
+      <Register onRegister={handleRegister} onSwitchToLogin={() => setAuthView('login')} />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[#F9F7F4] flex flex-col relative overflow-hidden">
-      {/* Navigation Bar */}
-      <div className="bg-white border-b border-[#EAE3D9] p-4 flex gap-4 overflow-x-auto shrink-0 z-50 shadow-sm items-center">
-        <div className="flex gap-2 mr-4 border-r border-[#EAE3D9] pr-4">
-           <button 
-            onClick={() => setLanguage('en')}
-            className={`px-2 py-1 rounded text-[10px] font-black tracking-widest uppercase transition-colors ${language === 'en' ? 'bg-[#3E1510] text-white' : 'text-[#A88C87] hover:bg-[#F9F7F4]'}`}
-           >
-             EN
-           </button>
-           <button 
-            onClick={() => setLanguage('id')}
-            className={`px-2 py-1 rounded text-[10px] font-black tracking-widest uppercase transition-colors ${language === 'id' ? 'bg-[#3E1510] text-white' : 'text-[#A88C87] hover:bg-[#F9F7F4]'}`}
-           >
-             ID
-           </button>
-        </div>
-        <button 
-          onClick={() => setCurrentView('executive')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'executive' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          Executive Overview
-        </button>
-        <button 
-          onClick={() => setCurrentView('draft')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'draft' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          Draft Report
-        </button>
-        <button 
-          onClick={() => setCurrentView('revenue-sync')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap flex items-center gap-2 ${currentView === 'revenue-sync' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          <Landmark size={14} />
-          Revenue Sync
-        </button>
-        <button 
-          onClick={() => setCurrentView('scratchpad')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap flex items-center gap-2 ${currentView === 'scratchpad' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          <LayoutTemplate size={14} />
-          Insight Scratchpad
-        </button>
-        <button 
-          onClick={() => setCurrentView('ga4')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'ga4' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          GA4
-        </button>
-        <button 
-          onClick={() => setCurrentView('meta')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'meta' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          Meta Ads
-        </button>
-        <button 
-          onClick={() => setCurrentView('tiktok')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'tiktok' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          TikTok
-        </button>
-        <button 
-          onClick={() => setCurrentView('youtube')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'youtube' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          YouTube
-        </button>
-        <button 
-          onClick={() => setCurrentView('gsc')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'gsc' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          Search Console
-        </button>
-        <button 
-          onClick={() => setCurrentView('email')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'email' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          Email & CRM
-        </button>
-        <button 
-          onClick={() => setCurrentView('connectors')}
-          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'connectors' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
-        >
-          Connectors
-        </button>
+    <div className="flex bg-[#F9F7F4] min-h-screen">
+      <Sidebar 
+        currentView={currentView} 
+        onViewChange={setCurrentView} 
+        user={user}
+        logoUrl={logoUrl}
+        onLogout={handleLogout}
+      />
+
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Global Toolbar */}
+        <header className="h-16 bg-white border-b border-[#EAE3D9] flex items-center justify-between px-8 shrink-0 z-50">
+          <div className="flex items-center gap-6">
+            <h2 className="font-serif font-black text-[#3E1510] tracking-tight">
+              {currentView.replace('-', ' ').toUpperCase()}
+            </h2>
+            <div className="h-4 w-px bg-[#EAE3D9]" />
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-1 rounded text-[10px] font-black tracking-widest uppercase transition-colors ${language === 'en' ? 'bg-[#3E1510] text-white' : 'text-[#A88C87] hover:bg-[#F9F7F4]'}`}
+              >
+                EN
+              </button>
+              <button 
+                onClick={() => setLanguage('id')}
+                className={`px-2 py-1 rounded text-[10px] font-black tracking-widest uppercase transition-colors ${language === 'id' ? 'bg-[#3E1510] text-white' : 'text-[#A88C87] hover:bg-[#F9F7F4]'}`}
+              >
+                ID
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <GlobalDateRangePicker range={dateRange} onChange={setDateRange} />
+            <button className="p-2.5 bg-[#FDF8F3] border border-[#EAE3D9] rounded-xl text-[#3E1510] relative group">
+              <Sparkles size={18} className="text-brand-secondary" />
+              <div className="absolute top-full right-0 mt-2 p-3 bg-[#3E1510] text-white text-[10px] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity z-[100] w-48 shadow-2xl pointer-events-none">
+                 AI Insights are up to date based on the selected date window.
+              </div>
+            </button>
+          </div>
+        </header>
+
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-y-auto relative bg-[#F9F7F4]">
+          {currentView === 'executive' && <DigitalOverview onDataLoaded={handleContextUpdate} dateRange={dateRange} />}
+          {currentView === 'scratchpad' && (
+            <div className="p-8 max-w-7xl mx-auto w-full">
+              <CustomInsightsBuilder availableContext={activeContext} preferredLanguage={language} />
+            </div>
+          )}
+          {currentView === 'revenue-sync' && (
+            <div className="p-8 max-w-7xl mx-auto w-full">
+              <SalesCycleView 
+                business={{ name: 'Digital Insights Pro', industry: 'saas' } as any}
+                adData={[]} 
+                crmData={[]} 
+              />
+            </div>
+          )}
+          {currentView === 'draft' && <DraftReportView />}
+          {currentView === 'email' && <EmailPlatformOverview />}
+          {currentView === 'tiktok' && <TiktokPlatformOverview />}
+          {currentView === 'ga4' && <Ga4PlatformOverview />}
+          {currentView === 'meta' && <MetaPlatformOverview onDataLoaded={handleContextUpdate} />}
+          {currentView === 'gsc' && <GscPlatformOverview />}
+          {currentView === 'youtube' && <YoutubePlatformOverview />}
+          {currentView === 'connectors' && <ConnectorsSetup />}
+          {currentView === 'profile' && <ProfileSettings user={user} logoUrl={logoUrl} onUpdateLogo={handleUpdateLogo} />}
+          {currentView === 'users' && (
+            <div className="flex items-center justify-center p-20 text-[#A88C87] font-bold uppercase tracking-widest text-xs h-full">
+              User Management coming soon (Firebase RBAC integration)
+            </div>
+          )}
+        </main>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col relative">
-        {currentView === 'executive' && <ExecutiveOverview onDataLoaded={handleContextUpdate} />}
-        {currentView === 'scratchpad' && (
-          <div className="p-8 max-w-7xl mx-auto w-full">
-            <CustomInsightsBuilder availableContext={activeContext} preferredLanguage={language} />
-          </div>
-        )}
-        {currentView === 'revenue-sync' && (
-          <div className="p-8 max-w-7xl mx-auto w-full">
-            <SalesCycleView 
-              business={{ name: 'Digital Insights Pro', industry: 'saas' } as any}
-              adData={[]} 
-              crmData={[]} 
-            />
-          </div>
-        )}
-        {currentView === 'draft' && <DraftReportView />}
-        {currentView === 'email' && <EmailPlatformOverview />}
-        {currentView === 'tiktok' && <TiktokPlatformOverview />}
-        {currentView === 'ga4' && <Ga4PlatformOverview />}
-        {currentView === 'meta' && <MetaPlatformOverview onDataLoaded={handleContextUpdate} />}
-        {currentView === 'gsc' && <GscPlatformOverview />}
-        {currentView === 'youtube' && <YoutubePlatformOverview />}
-        {currentView === 'connectors' && <ConnectorsSetup />}
-      </div>
-
-      {/* AI Analyst Floating Trigger */}
+      {/* Overlays */}
       <button
         onClick={() => setIsSidebarOpen(true)}
         className="fixed bottom-8 right-8 w-16 h-16 bg-[#7A2B20] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 group"
@@ -159,7 +235,6 @@ export default function App() {
         <MessageSquare size={28} />
       </button>
 
-      {/* AI Analyst Sidebar */}
       <AiAnalystSidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
@@ -169,9 +244,7 @@ export default function App() {
 
       <CommandCenter 
         onNavigate={(view) => setCurrentView(view)} 
-        onAiAsk={(q) => {
-          setIsSidebarOpen(true);
-        }} 
+        onAiAsk={() => setIsSidebarOpen(true)} 
       />
     </div>
   );
