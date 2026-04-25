@@ -14,16 +14,26 @@ interface AiAnalystSidebarProps {
   dashboardContext: any;
   isOpen: boolean;
   onClose: () => void;
+  language?: 'en' | 'id';
 }
 
-export const AiAnalystSidebar: React.FC<AiAnalystSidebarProps> = ({ dashboardContext, isOpen, onClose }) => {
+export const AiAnalystSidebar: React.FC<AiAnalystSidebarProps> = ({ 
+  dashboardContext, 
+  isOpen, 
+  onClose,
+  language = 'en'
+}) => {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hello! I am your AI Marketing Analyst. I have scanned the current view. How can I help you today?' }
+    { role: 'assistant', content: language === 'id' ? 'Halo! Saya adalah Analis Pemasaran AI Anda. Saya telah memindai tampilan saat ini. Ada yang bisa saya bantu hari ini?' : 'Hello! I am your AI Marketing Analyst. I have scanned the current view. How can I help you today?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [alerts, setAlerts] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMessages([{ role: 'assistant', content: language === 'id' ? 'Halo! Saya adalah Analis Pemasaran AI Anda. Saya telah memindai tampilan saat ini. Ada yang bisa saya bantu hari ini?' : 'Hello! I am your AI Marketing Analyst. I have scanned the current view. How can I help you today?' }]);
+  }, [language]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -50,7 +60,7 @@ export const AiAnalystSidebar: React.FC<AiAnalystSidebarProps> = ({ dashboardCon
     setInput('');
     setIsLoading(true);
 
-    const response = await analyzeDashboardQuery(text, dashboardContext);
+    const response = await analyzeDashboardQuery(text, dashboardContext, language);
     
     const assistantMessage: Message = { role: 'assistant', content: response };
     setMessages(prev => [...prev, assistantMessage]);
@@ -58,9 +68,9 @@ export const AiAnalystSidebar: React.FC<AiAnalystSidebarProps> = ({ dashboardCon
   };
 
   const quickActions = [
-    { label: 'Summarize Performance', query: 'Give me a high-level summary of the performance in this view.' },
-    { label: 'Find Anomalies', query: 'What are the biggest anomalies or red flags in this data?' },
-    { label: 'Channel Comparison', query: 'Compare the performance effectiveness of the different channels shown.' }
+    { label: language === 'id' ? 'Ringkasan Performa' : 'Summarize Performance', query: 'Give me a high-level summary of the performance in this view.' },
+    { label: language === 'id' ? 'Cari Anomali' : 'Find Anomalies', query: 'What are the biggest anomalies or red flags in this data?' },
+    { label: language === 'id' ? 'Perbandingan Channel' : 'Channel Comparison', query: 'Compare the performance effectiveness of the different channels shown.' }
   ];
 
   return (

@@ -65,12 +65,12 @@ export const PacingChart: React.FC<PacingChartProps> = ({
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl font-bold font-serif text-[#3E1510]">{title}</h2>
         <div className="flex items-center gap-4 text-sm font-medium">
-            <div className="flex items-center gap-1.5 text-[#7A2B20]">
-                <div className="w-3 h-3 rounded-full bg-[#7A2B20]"></div>
+            <div className="flex items-center gap-1.5 text-brand-primary">
+                <div className="w-3 h-3 rounded-full bg-brand-primary"></div>
                 {primaryLabel}
             </div>
-            <div className="flex items-center gap-1.5 text-[#DDA77B]">
-                <div className="w-3 h-3 rounded-md bg-[#DDA77B] opacity-40"></div>
+            <div className="flex items-center gap-1.5 text-brand-secondary">
+                <div className="w-3 h-3 rounded-md bg-brand-secondary opacity-40"></div>
                 {secondaryLabel}
             </div>
         </div>
@@ -121,7 +121,7 @@ export const PacingChart: React.FC<PacingChartProps> = ({
               yAxisId="right"
               dataKey={secondaryKey} 
               name={secondaryLabel}
-              fill="#DDA77B" 
+              fill="var(--color-brand-secondary)" 
               fillOpacity={0.4}
               radius={[4, 4, 0, 0]}
               barSize={32}
@@ -131,10 +131,10 @@ export const PacingChart: React.FC<PacingChartProps> = ({
               type="monotone" 
               dataKey={primaryKey} 
               name={primaryLabel}
-              stroke="#7A2B20" 
+              stroke="var(--color-brand-primary)" 
               strokeWidth={4} 
               dot={false}
-              activeDot={{ r: 6, fill: '#7A2B20', stroke: '#fff', strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: 'var(--color-brand-primary)', stroke: '#fff', strokeWidth: 2 }}
             />
           </ComposedChart>
         </ResponsiveContainer>

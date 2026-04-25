@@ -1,11 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   FileText, 
   Download, 
   Presentation, 
   CheckCircle,
   Sparkles,
-  Loader2
+  Loader2,
+  Edit3,
+  Save,
+  Clock
 } from 'lucide-react';
 import { BusinessProfile } from './types/business';
 import { 
@@ -13,12 +16,17 @@ import {
   DashboardContextData, 
   ReportDraft 
 } from './lib/gemini';
+import { PdfExportService } from './components/dashboard/PdfExportService';
 
 const CURRENT_BUSINESS: BusinessProfile = {
   name: 'Digital Insights Pro',
   industry: 'saas',
   primaryGoal: 'Scale Monthly Recurring Revenue with 4.0x LTV:CAC efficiency',
-  persona: 'analytical'
+  persona: 'analytical',
+  theme: {
+    primaryColor: '#7A2B20',
+    secondaryColor: '#DDA77B'
+  }
 };
 
 const MOCK_DRAFT: ReportDraft = {
@@ -63,8 +71,19 @@ export default function DraftReportView() {
   const [draft, setDraft] = useState<ReportDraft>(MOCK_DRAFT);
   const [isGenerating, setIsGenerating] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  // Load from persistence
+  useEffect(() => {
+    const saved = localStorage.getItem(`draft_${CURRENT_BUSINESS.name}_April_2026`);
+    if (saved) {
+      setDraft(JSON.parse(saved));
+    }
+  }, []);
 
   const handleGenerateNarrative = async (refinementNote?: string) => {
     if (isGenerating) return;
@@ -98,6 +117,30 @@ export default function DraftReportView() {
     setCustomPrompt('');
   };
 
+  const handleFinalize = () => {
+    const finalizedDraft: ReportDraft = {
+      ...draft,
+      status: 'Approved',
+      lastUpdated: new Date().toLocaleString()
+    };
+    setDraft(finalizedDraft);
+    // Persistence Strategy
+    localStorage.setItem(`draft_${CURRENT_BUSINESS.name}_April_2026`, JSON.stringify(finalizedDraft));
+    alert('Report Finalized and Saved to History.');
+  };
+
+  const startEditing = (id: string, content: string) => {
+    setEditingId(id);
+    setEditContent(content);
+  };
+
+  const saveEdit = (id: string) => {
+    setDraft(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => s.id === id ? { ...s, content: editContent } : s)
+    }));
+    setEditingId(null);
+  };
 
   const handleInlineRefine = (heading: string) => {
     setCustomPrompt(`Rewrite the [${heading}] section to be more...`);
@@ -112,54 +155,59 @@ export default function DraftReportView() {
       {/* Section A: The Workspace Header */}
       <div className="bg-white border-b border-[#EAE3D9] px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sticky top-0 z-20 shadow-sm shrink-0">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-[#FDF8F3] border border-[#EAE3D9] flex items-center justify-center text-[#7A2B20]">
+          <div className="w-10 h-10 rounded-xl bg-[#FDF8F3] border border-[#EAE3D9] flex items-center justify-center text-brand-primary">
             <FileText size={20} />
           </div>
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold font-serif text-[#3E1510]">Month-End Narrative</h1>
-              <span className="px-2.5 py-1 rounded-md bg-[#FDF4E6] text-[#A46A38] text-[10px] font-bold uppercase tracking-wider">
+              <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${draft.status === 'Approved' ? 'bg-[#E6F4EA] text-[#1E7E34]' : 'bg-[#FDF4E6] text-[#A46A38]'}`}>
                 {isGenerating ? 'Generating' : draft.status}
               </span>
             </div>
-            <p className="text-xs text-[#A88C87] font-medium mt-0.5">Last updated: {isGenerating ? '...' : draft.lastUpdated}</p>
+            <p className="text-xs text-[#A88C87] font-medium mt-0.5 flex items-center gap-1">
+              <Clock size={12} />
+              Last updated: {isGenerating ? '...' : draft.lastUpdated}
+            </p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <PdfExportService contentRef={printRef} documentTitle={`${CURRENT_BUSINESS.name}-Report-${draft.month}`} />
           <button 
-            disabled={isGenerating}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-[#EAE3D9] rounded-xl text-sm font-semibold text-[#5C4541] hover:bg-[#FDF8F3] hover:text-[#3E1510] hover:border-[#DDA77B] transition-all disabled:opacity-50"
-          >
-            <Download size={16} />
-            <span className="hidden md:inline">Export to</span> PDF
-          </button>
-          <button 
-            disabled={isGenerating}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-[#EAE3D9] rounded-xl text-sm font-semibold text-[#5C4541] hover:bg-[#FDF8F3] hover:text-[#3E1510] hover:border-[#DDA77B] transition-all disabled:opacity-50"
-          >
-            <Presentation size={16} />
-            <span className="hidden md:inline">Export to</span> Google Slides
-          </button>
-          <button 
-            disabled={isGenerating}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-[#7A2B20] text-white rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:bg-[#6A241A] transition-all disabled:opacity-50"
+            disabled={isGenerating || draft.status === 'Approved'}
+            onClick={handleFinalize}
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-brand-primary text-white rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:grayscale"
           >
             <CheckCircle size={16} />
-            Approve & Save
+            {draft.status === 'Approved' ? 'Already Approved' : 'Approve & Finalize'}
           </button>
         </div>
       </div>
 
       {/* Section B: The Document Canvas (Main Scrollable Area) */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center custom-scrollbar relative">
-        <div className="max-w-4xl w-full bg-white rounded-[2rem] shadow-sm border border-[#EAE3D9] mb-[80px] relative overflow-hidden">
+        <div ref={printRef} className="max-w-4xl w-full bg-white rounded-[2rem] shadow-sm border border-[#EAE3D9] mb-[80px] relative overflow-hidden">
+          
+          {/* PDF Header (Only visible in PDF) */}
+          <div className="hidden print:block p-12 border-b-4 border-brand-primary bg-[#FDF8F3]">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-3xl font-serif font-extrabold text-brand-primary">{CURRENT_BUSINESS.name}</h2>
+                <p className="text-sm font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1">Monthly Analytics Insight</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-bold text-[#A88C87] uppercase">Reporting Period</p>
+                <p className="text-xl font-bold text-[#3E1510]">{draft.month}</p>
+              </div>
+            </div>
+          </div>
           
           {/* Loading Overlay */}
           {isGenerating && (
             <div className="absolute inset-0 z-10 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center">
               <div className="w-16 h-16 bg-[#FDF8F3] rounded-2xl flex items-center justify-center shadow-sm mb-6 border border-[#EAE3D9]">
-                <Loader2 size={32} className="text-[#7A2B20] animate-spin flex-shrink-0" />
+                <Loader2 size={32} className="text-brand-primary animate-spin flex-shrink-0" />
               </div>
               <h2 className="text-2xl font-serif font-bold text-[#3E1510] mb-2">Analyzing blended metrics...</h2>
               <p className="text-[#A88C87] font-medium flex items-center gap-2 animate-pulse">
@@ -170,22 +218,40 @@ export default function DraftReportView() {
 
           <div className={`p-8 md:p-14 transition-opacity duration-500 ${isGenerating ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
             {draft.sections.map((section) => {
+              const isEditing = editingId === section.id;
+
               if (section.type === 'title') {
                 return (
                   <div key={section.id} className="mb-12 text-center relative group">
-                    <h2 className="text-4xl font-serif font-bold text-[#3E1510] leading-tight mb-4 pr-8">
-                      {section.heading}
-                    </h2>
-                    <p className="text-lg text-[#A88C87] font-medium tracking-wide uppercase">
-                      {section.content}
-                    </p>
-                    <button 
-                      onClick={() => handleInlineRefine(section.heading)}
-                      className="absolute top-2 right-0 opacity-0 group-hover:opacity-100 p-2 text-[#DDA77B] hover:text-[#7A2B20] bg-[#FDF8F3] rounded-lg transition-all" 
-                      title="Rewrite Title"
-                    >
-                      <Sparkles size={20} />
-                    </button>
+                    {isEditing ? (
+                      <div className="space-y-4">
+                        <input 
+                          type="text" 
+                          value={editContent} 
+                          onChange={(e) => setEditContent(e.target.value)}
+                          className="text-center w-full text-4xl font-serif font-bold text-[#3E1510] border-b-2 border-brand-primary outline-none py-2"
+                        />
+                        <button onClick={() => saveEdit(section.id)} className="flex items-center gap-2 mx-auto text-sm font-bold text-brand-primary"><Save size={16} /> Save Changes</button>
+                      </div>
+                    ) : (
+                      <>
+                        <h2 className="text-4xl font-serif font-bold text-[#3E1510] leading-tight mb-4 pr-8 print:pr-0">
+                          {section.heading}
+                        </h2>
+                        <p className="text-lg text-[#A88C87] font-medium tracking-wide uppercase">
+                          {section.content}
+                        </p>
+                        <div className="absolute top-2 right-0 flex gap-2 print:hidden">
+                          <button 
+                            onClick={() => startEditing(section.id, section.heading)}
+                            className="opacity-0 group-hover:opacity-100 p-2 text-[#A88C87] hover:text-brand-primary bg-[#FDF8F3] rounded-lg transition-all" 
+                            title="Edit"
+                          >
+                            <Edit3 size={18} />
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 );
               }
@@ -196,17 +262,36 @@ export default function DraftReportView() {
                     <h3 className="text-xl font-bold text-[#5C4541] font-serif">
                       {section.heading}
                     </h3>
-                    <button 
-                      onClick={() => handleInlineRefine(section.heading)}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 text-[#DDA77B] hover:text-[#7A2B20] bg-[#FDF8F3] rounded-md transition-all -mb-1" 
-                      title="Rewrite Section"
-                    >
-                      <Sparkles size={16} />
-                    </button>
+                    <div className="flex gap-2 print:hidden">
+                      <button 
+                        onClick={() => startEditing(section.id, section.content)}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 text-[#A88C87] hover:text-brand-primary bg-[#FDF8F3] rounded-md transition-all -mb-1"
+                      >
+                        <Edit3 size={16} />
+                      </button>
+                      <button 
+                        onClick={() => handleInlineRefine(section.heading)}
+                        className="opacity-0 group-hover:opacity-100 p-1.5 text-brand-secondary hover:text-brand-primary bg-[#FDF8F3] rounded-md transition-all -mb-1" 
+                        title="AI Rewrite"
+                      >
+                        <Sparkles size={16} />
+                      </button>
+                    </div>
                   </div>
-                  <div className="text-base text-[#3E1510] leading-relaxed whitespace-pre-wrap pl-1 group-hover:bg-[#F9F7F4]/50 rounded-lg transition-colors p-2 -ml-3">
-                    {section.content}
-                  </div>
+                  {isEditing ? (
+                    <div className="space-y-4">
+                      <textarea 
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        className="w-full h-32 p-4 text-base text-[#3E1510] border-2 border-brand-primary rounded-xl outline-none"
+                      />
+                      <button onClick={() => saveEdit(section.id)} className="flex items-center gap-2 text-sm font-bold text-brand-primary bg-white border border-brand-primary px-4 py-2 rounded-lg hover:bg-brand-primary hover:text-white transition-all"><Save size={16} /> Save Section</button>
+                    </div>
+                  ) : (
+                    <div className="text-base text-[#3E1510] leading-relaxed whitespace-pre-wrap pl-1 group-hover:bg-[#F9F7F4]/50 rounded-lg transition-colors p-2 -ml-3">
+                      {section.content}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -215,8 +300,8 @@ export default function DraftReportView() {
       </div>
 
       {/* Section C: The AI Refinement Prompt Bar (Sticky Bottom) */}
-      <div className="bg-white border-t border-[#EAE3D9] p-4 z-20 shrink-0 sticky bottom-0">
-        <div className={`max-w-4xl mx-auto flex items-end gap-3 bg-[#FDF8F3] border border-[#EAE3D9] rounded-[1.25rem] p-2 shadow-sm focus-within:ring-2 focus-within:ring-[#DDA77B]/50 focus-within:border-[#DDA77B] transition-all ${isGenerating ? 'opacity-50 pointer-events-none' : ''}`}>
+      <div className="bg-white border-t border-[#EAE3D9] p-4 z-20 shrink-0 sticky bottom-0 print:hidden">
+        <div className={`max-w-4xl mx-auto flex items-end gap-3 bg-[#FDF8F3] border border-[#EAE3D9] rounded-[1.25rem] p-2 shadow-sm focus-within:ring-2 focus-within:ring-brand-secondary/50 focus-within:border-brand-secondary transition-all ${isGenerating ? 'opacity-50 pointer-events-none' : ''}`}>
           <textarea 
             ref={textareaRef}
             value={customPrompt}
@@ -231,21 +316,15 @@ export default function DraftReportView() {
               }
             }}
             className="flex-1 bg-transparent border-none outline-none resize-none px-4 py-3 text-sm text-[#3E1510] placeholder:text-[#A88C87] min-h-[52px] max-h-[120px]"
-            placeholder="Refine this narrative (e.g., 'Make the executive summary punchier' or 'Add the latest TikTok views')..."
+            placeholder="Refine this narrative with AI (e.g., 'Make it more aggressive' or 'Add data about high CPA')..."
             rows={1}
-            onInput={(e) => {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = 'auto';
-              target.style.height = `${target.scrollHeight}px`;
-            }}
           />
           <button 
             onClick={() => handleGenerateNarrative(customPrompt)}
-            disabled={isGenerating || (!customPrompt.trim() && isGenerating)}
-            className="h-[44px] w-[44px] flex items-center justify-center shrink-0 bg-[#7A2B20] text-white rounded-xl shadow hover:bg-[#6A241A] transition-colors mb-1 mr-1 disabled:opacity-70"
+            disabled={isGenerating || !customPrompt.trim()}
+            className="h-[44px] w-[44px] flex items-center justify-center shrink-0 bg-brand-primary text-white rounded-xl shadow hover:bg-opacity-90 transition-colors mb-1 mr-1 disabled:opacity-70"
           >
             {isGenerating ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} fill="currentColor" className="opacity-90" />}
-            <span className="sr-only">Generate</span>
           </button>
         </div>
       </div>
@@ -253,4 +332,3 @@ export default function DraftReportView() {
     </div>
   );
 }
-

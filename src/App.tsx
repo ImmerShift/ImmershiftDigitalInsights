@@ -13,15 +13,19 @@ import DraftReportView from './DraftReportView';
 import EmailPlatformOverview from './EmailPlatformOverview';
 import TiktokPlatformOverview from './TiktokPlatformOverview';
 import Ga4PlatformOverview from './Ga4PlatformOverview';
+import { SalesCycleView } from './components/dashboard/SalesCycleView';
+import { CustomInsightsBuilder } from './components/dashboard/CustomInsightsBuilder';
+import { CommandCenter } from './components/dashboard/CommandCenter';
 import { AiAnalystSidebar } from './components/dashboard/AiAnalystSidebar';
-import { MessageSquare, Sparkles } from 'lucide-react';
+import { MessageSquare, Sparkles, Landmark, LayoutTemplate } from 'lucide-react';
 
-type ViewType = 'connectors' | 'gsc' | 'youtube' | 'meta' | 'executive' | 'draft' | 'email' | 'tiktok' | 'ga4';
+type ViewType = 'connectors' | 'gsc' | 'youtube' | 'meta' | 'executive' | 'draft' | 'email' | 'tiktok' | 'ga4' | 'revenue-sync' | 'scratchpad';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<ViewType>('ga4');
+  const [currentView, setCurrentView] = useState<ViewType>('executive');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeContext, setActiveContext] = useState<any>(null);
+  const [language, setLanguage] = useState<'en' | 'id'>('en');
 
   // This function allows child views to register their data context for the AI Analyst
   const handleContextUpdate = (data: any) => {
@@ -31,7 +35,21 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#F9F7F4] flex flex-col relative overflow-hidden">
       {/* Navigation Bar */}
-      <div className="bg-white border-b border-[#EAE3D9] p-4 flex gap-4 overflow-x-auto shrink-0 z-50 shadow-sm">
+      <div className="bg-white border-b border-[#EAE3D9] p-4 flex gap-4 overflow-x-auto shrink-0 z-50 shadow-sm items-center">
+        <div className="flex gap-2 mr-4 border-r border-[#EAE3D9] pr-4">
+           <button 
+            onClick={() => setLanguage('en')}
+            className={`px-2 py-1 rounded text-[10px] font-black tracking-widest uppercase transition-colors ${language === 'en' ? 'bg-[#3E1510] text-white' : 'text-[#A88C87] hover:bg-[#F9F7F4]'}`}
+           >
+             EN
+           </button>
+           <button 
+            onClick={() => setLanguage('id')}
+            className={`px-2 py-1 rounded text-[10px] font-black tracking-widest uppercase transition-colors ${language === 'id' ? 'bg-[#3E1510] text-white' : 'text-[#A88C87] hover:bg-[#F9F7F4]'}`}
+           >
+             ID
+           </button>
+        </div>
         <button 
           onClick={() => setCurrentView('executive')}
           className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'executive' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
@@ -43,6 +61,20 @@ export default function App() {
           className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${currentView === 'draft' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
         >
           Draft Report
+        </button>
+        <button 
+          onClick={() => setCurrentView('revenue-sync')}
+          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap flex items-center gap-2 ${currentView === 'revenue-sync' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
+        >
+          <Landmark size={14} />
+          Revenue Sync
+        </button>
+        <button 
+          onClick={() => setCurrentView('scratchpad')}
+          className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap flex items-center gap-2 ${currentView === 'scratchpad' ? 'bg-[#7A2B20] text-white' : 'bg-[#FDF8F3] text-[#5C4541] border border-[#EAE3D9] hover:bg-[#F9F7F4]'}`}
+        >
+          <LayoutTemplate size={14} />
+          Insight Scratchpad
         </button>
         <button 
           onClick={() => setCurrentView('ga4')}
@@ -91,6 +123,20 @@ export default function App() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col relative">
         {currentView === 'executive' && <ExecutiveOverview onDataLoaded={handleContextUpdate} />}
+        {currentView === 'scratchpad' && (
+          <div className="p-8 max-w-7xl mx-auto w-full">
+            <CustomInsightsBuilder availableContext={activeContext} preferredLanguage={language} />
+          </div>
+        )}
+        {currentView === 'revenue-sync' && (
+          <div className="p-8 max-w-7xl mx-auto w-full">
+            <SalesCycleView 
+              business={{ name: 'Digital Insights Pro', industry: 'saas' } as any}
+              adData={[]} 
+              crmData={[]} 
+            />
+          </div>
+        )}
         {currentView === 'draft' && <DraftReportView />}
         {currentView === 'email' && <EmailPlatformOverview />}
         {currentView === 'tiktok' && <TiktokPlatformOverview />}
@@ -118,6 +164,14 @@ export default function App() {
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
         dashboardContext={activeContext}
+        language={language}
+      />
+
+      <CommandCenter 
+        onNavigate={(view) => setCurrentView(view)} 
+        onAiAsk={(q) => {
+          setIsSidebarOpen(true);
+        }} 
       />
     </div>
   );

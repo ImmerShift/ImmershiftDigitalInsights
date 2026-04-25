@@ -18,6 +18,7 @@ export function useDashboardData<T>(
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLive, setIsLive] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -26,6 +27,7 @@ export function useDashboardData<T>(
       // Reset states before fetching
       setIsLoading(true);
       setError(null);
+      setIsLive(false);
 
       try {
         // Attempt to fetch live data from the internal GAS bridge
@@ -34,6 +36,7 @@ export function useDashboardData<T>(
         if (isMounted) {
           // If successful, cast and set the live data
           setData(fetchedResult as T);
+          setIsLive(true);
         }
       } catch (err: any) {
         if (isMounted) {
@@ -45,6 +48,7 @@ export function useDashboardData<T>(
           console.error(`⚠️ API Bridge Error for ${platform}. Falling back to mock data.`, err);
           setError(err.message || 'Failed to fetch live data');
           setData(mockFallbackData);
+          setIsLive(false);
         }
       } finally {
         if (isMounted) {
@@ -61,5 +65,5 @@ export function useDashboardData<T>(
     };
   }, [platform, mockFallbackData]);
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, isLive };
 }

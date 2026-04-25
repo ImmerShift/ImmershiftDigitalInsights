@@ -22,8 +22,8 @@ export interface ChannelEconomicsTableProps {
 export const ChannelEconomicsTable: React.FC<ChannelEconomicsTableProps> = ({ title, data, labels }) => {
   return (
     <div className="bg-white rounded-2xl border border-[#EAE3D9] overflow-hidden shadow-sm">
-      <div className="p-6 border-b border-[#EAE3D9] flex items-center gap-3">
-        <PieChart className="text-[#A88C87]" size={20} />
+      <div className="p-6 border-b border-[#EAE3D9] flex items-center gap-3 bg-[#FDF8F3]">
+        <PieChart className="text-brand-primary" size={20} />
         <h2 className="text-xl font-bold font-serif text-[#3E1510]">{title}</h2>
       </div>
       <div className="overflow-x-auto">
@@ -46,7 +46,7 @@ export const ChannelEconomicsTable: React.FC<ChannelEconomicsTableProps> = ({ ti
                 <td className="px-6 py-5 text-sm font-medium text-[#5C4541] text-right">
                   {item.metric1}
                 </td>
-                <td className="px-6 py-5 text-sm font-medium text-[#7A2B20] text-right">
+                <td className="px-6 py-5 text-sm font-medium text-brand-primary text-right">
                   {item.metric2}
                 </td>
                 <td className="px-6 py-5 text-sm font-bold text-[#2E6B3B] text-right">
@@ -58,7 +58,7 @@ export const ChannelEconomicsTable: React.FC<ChannelEconomicsTableProps> = ({ ti
                   <div className="flex items-center gap-3">
                     <div className="flex-1 h-2 bg-[#EAE3D9] rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-[#DDA77B] rounded-full"
+                        className="h-full bg-brand-secondary rounded-full"
                         style={{ width: `${item.share}%` }}
                       ></div>
                     </div>
