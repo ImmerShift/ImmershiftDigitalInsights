@@ -163,17 +163,17 @@ export default function EmailPlatformOverview() {
           </div>
           
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <button className="flex items-center gap-2 px-3 py-2 bg-[#F9F7F4] border border-[#EAE3D9] rounded-lg text-sm font-medium text-[#5C4541] hover:bg-[#FDF8F3] transition-colors">
+            <button disabled aria-disabled="true" title="Filter functionality coming soon" className="flex items-center gap-2 px-3 py-2 bg-[#F9F7F4] border border-[#EAE3D9] rounded-lg text-sm font-medium text-[#5C4541] opacity-50 cursor-not-allowed transition-colors">
               <Calendar size={16} />
               Last 7 Days
               <ChevronDown size={14} className="ml-1" />
             </button>
-            <button className="flex items-center gap-2 px-3 py-2 bg-[#F9F7F4] border border-[#EAE3D9] rounded-lg text-sm font-medium text-[#5C4541] hover:bg-[#FDF8F3] transition-colors">
+            <button disabled aria-disabled="true" title="Filter functionality coming soon" className="flex items-center gap-2 px-3 py-2 bg-[#F9F7F4] border border-[#EAE3D9] rounded-lg text-sm font-medium text-[#5C4541] opacity-50 cursor-not-allowed transition-colors">
               <Filter size={16} />
               All Providers
               <ChevronDown size={14} className="ml-1" />
             </button>
-            <button className="flex items-center gap-2 px-3 py-2 bg-[#F9F7F4] border border-[#EAE3D9] rounded-lg text-sm font-medium text-[#5C4541] hover:bg-[#FDF8F3] transition-colors">
+            <button disabled aria-disabled="true" title="Filter functionality coming soon" className="flex items-center gap-2 px-3 py-2 bg-[#F9F7F4] border border-[#EAE3D9] rounded-lg text-sm font-medium text-[#5C4541] opacity-50 cursor-not-allowed transition-colors">
               <Users size={16} />
               All Campaigns
               <ChevronDown size={14} className="ml-1" />
@@ -181,7 +181,7 @@ export default function EmailPlatformOverview() {
             
             <div className="w-px h-6 bg-[#EAE3D9] hidden md:block mx-1"></div>
             
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#7A2B20] text-white rounded-lg text-sm font-bold shadow-sm hover:bg-[#6A241A] transition-colors ml-auto md:ml-0">
+            <button disabled aria-disabled="true" title="Export functionality coming soon" className="flex items-center gap-2 px-4 py-2 bg-[#7A2B20] text-white rounded-lg text-sm font-bold shadow-sm opacity-50 cursor-not-allowed transition-colors ml-auto md:ml-0">
               <Download size={16} />
               Export
             </button>
@@ -398,12 +398,12 @@ export default function EmailPlatformOverview() {
                 <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead>
                     <tr>
-                      <th className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Campaign Name</th>
-                      <th className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Provider</th>
-                      <th className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Sent</th>
-                      <th className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Open Rate</th>
-                      <th className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Click Rate</th>
-                      <th className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Revenue</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Campaign Name</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Provider</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Sent</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Open Rate</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Click Rate</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Revenue</th>
                     </tr>
                   </thead>
                   <tbody>

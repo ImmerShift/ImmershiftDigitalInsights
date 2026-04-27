@@ -46,11 +46,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister, onGoo
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Email Address</label>
+            <label htmlFor="login-email" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Email Address</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
               <input 
+                id="login-email"
                 type="email" 
+                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -62,13 +64,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister, onGoo
 
           <div className="space-y-2">
             <div className="flex justify-between items-center px-1">
-               <label className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest">Password</label>
-               <button type="button" className="text-[10px] font-black uppercase text-brand-primary hover:underline">Forgot?</button>
+               <label htmlFor="login-password" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest">Password</label>
+               <button type="button" disabled aria-disabled="true" title="Coming soon" className="text-[10px] font-black uppercase text-brand-primary opacity-50 cursor-not-allowed">Forgot?</button>
             </div>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
               <input 
+                id="login-password"
                 type="password" 
+                autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -79,7 +83,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister, onGoo
           </div>
 
           {error && (
-            <p className="text-[10px] font-bold text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2">
+            <p role="alert" aria-live="assertive" className="text-[10px] font-bold text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2">
               <ShieldCheck size={14} /> {error}
             </p>
           )}
@@ -105,13 +109,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister, onGoo
 
         <div className="mt-8 grid grid-cols-2 gap-4">
            <button 
+            aria-label="Sign in with Google"
             onClick={onGoogleLogin}
             className="flex items-center justify-center gap-2 py-3 bg-white border border-[#EAE3D9] rounded-xl text-xs font-bold text-[#5C4541] hover:bg-[#F9F7F4] transition-colors"
            >
-             <Chrome size={16} className="text-blue-500" /> Google
+             <Chrome aria-hidden="true" size={16} className="text-blue-500" /> Google
            </button>
-           <button className="flex items-center justify-center gap-2 py-3 bg-white border border-[#EAE3D9] rounded-xl text-xs font-bold text-[#5C4541] hover:bg-[#F9F7F4] transition-colors">
-             <Github size={16} /> GitHub
+           <button 
+             aria-label="Sign in with GitHub (Coming soon)"
+             disabled
+             aria-disabled="true"
+             className="flex items-center justify-center gap-2 py-3 bg-white border border-[#EAE3D9] rounded-xl text-xs font-bold text-[#5C4541] opacity-50 cursor-not-allowed transition-colors"
+           >
+             <Github aria-hidden="true" size={16} /> GitHub
            </button>
         </div>
 

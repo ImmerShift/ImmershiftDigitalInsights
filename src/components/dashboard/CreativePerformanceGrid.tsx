@@ -151,17 +151,18 @@ export const CreativePerformanceGrid: React.FC<{ business: BusinessProfile }> = 
             <div className="relative aspect-square overflow-hidden bg-gray-100 group">
               <img 
                 src={ad.thumbnail} 
-                alt="Ad Creative" 
+                alt={`${ad.platform} ad creative with ROAS ${ad.roas}`} 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute top-3 left-3 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-[10px] font-black uppercase text-[#3E1510] border border-[#EAE3D9]">
                 {ad.platform}
               </div>
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex items-center justify-center">
                  <button 
+                  aria-label={`Analyze ${ad.platform} creative`}
                   onClick={() => handleAnalyze(ad)}
-                  className="bg-white text-brand-primary p-3 rounded-full shadow-xl transform scale-75 group-hover:scale-100 transition-transform"
+                  className="bg-white text-brand-primary p-3 rounded-full shadow-xl transform scale-75 group-hover:scale-100 focus:scale-100 transition-transform focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
                  >
                    <Eye size={24} />
                  </button>
@@ -221,8 +222,8 @@ export const CreativePerformanceGrid: React.FC<{ business: BusinessProfile }> = 
             >
               <button 
                 onClick={() => setSelectedAd(null)}
-                className="absolute top-4 right-4 z-10 p-2 bg-white/20 hover:bg-white/40 rounded-full text-[#3E1510] transition-colors"
-                title="Close"
+                className="absolute top-4 right-4 z-10 p-2 bg-white/20 hover:bg-white/40 rounded-full text-[#3E1510] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3E1510]"
+                aria-label="Close"
               >
                 <X size={24} />
               </button>

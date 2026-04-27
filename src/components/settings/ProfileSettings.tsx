@@ -44,10 +44,17 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
     reader.readAsDataURL(file);
   };
 
+  const [toggles, setToggles] = useState({ pdf: true, clientDomain: false });
+
   const TabButton = ({ id, label, icon: Icon }: { id: typeof activeTab, label: string, icon: any }) => (
     <button
+      role="tab"
+      aria-selected={activeTab === id}
+      aria-controls={`panel-${id}`}
+      id={`tab-${id}`}
+      tabIndex={activeTab === id ? 0 : -1}
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 transition-all ${
+      className={`flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7A2B20] focus-visible:ring-offset-2 ${
         activeTab === id 
           ? 'border-[#7A2B20] text-[#7A2B20]' 
           : 'border-transparent text-[#A88C87] hover:text-[#5C4541]'
@@ -77,7 +84,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-[#EAE3D9] mb-8 overflow-x-auto whitespace-nowrap">
+      <div role="tablist" aria-label="Settings Categories" className="flex border-b border-[#EAE3D9] mb-8 overflow-x-auto whitespace-nowrap">
         <TabButton id="profile" label="User Profile" icon={User} />
         <TabButton id="brand" label="Brand Assets" icon={Palette} />
         <TabButton id="security" label="Security" icon={Lock} />
@@ -86,7 +93,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
 
       <div className="bg-white rounded-[2.5rem] border border-[#EAE3D9] p-10 shadow-sm">
         {activeTab === 'profile' && (
-          <div className="space-y-8">
+          <div role="tabpanel" id="panel-profile" aria-labelledby="tab-profile" className="space-y-8">
             <div className="flex items-center gap-8">
               <div className="relative group">
                 <div className="w-24 h-24 rounded-3xl bg-[#F9F7F4] border-2 border-[#EAE3D9] flex items-center justify-center text-3xl font-black text-brand-primary overflow-hidden">
@@ -128,7 +135,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
         )}
 
         {activeTab === 'brand' && (
-          <div className="space-y-10">
+          <div role="tabpanel" id="panel-brand" aria-labelledby="tab-brand" className="space-y-10">
             <div className="flex flex-col md:flex-row gap-10 items-start">
                <div className="w-full md:w-1/3">
                   <h4 className="font-bold text-[#3E1510] mb-2">Company Logo</h4>
@@ -137,7 +144,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
                   </p>
                </div>
                <div className="w-full md:w-2/3">
-                  <div className={`border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center transition-all ${isUploading ? 'bg-[#F9F7F4] border-[#DDA77B]' : 'border-[#EAE3D9] hover:border-brand-primary'}`}>
+                  <div aria-busy={isUploading} className={`border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center transition-all ${isUploading ? 'bg-[#F9F7F4] border-[#DDA77B]' : 'border-[#EAE3D9] hover:border-brand-primary'}`}>
                     {logoUrl ? (
                       <div className="relative mb-6 group">
                          <div className="w-32 h-32 bg-[#F9F7F4] rounded-2xl flex items-center justify-center overflow-hidden border border-[#EAE3D9]">
@@ -172,17 +179,23 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
               <h4 className="font-bold text-[#3E1510] mb-6">Brand Permissions</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  {[
-                   { label: 'Apply to PDF Exports', desc: 'Auto-inject logo into all generated report documents.', enabled: true },
-                   { label: 'Enable Client Domain', desc: 'Map this dashboard to your custom agency subdomain.', enabled: false },
+                   { id: 'pdf', label: 'Apply to PDF Exports', desc: 'Auto-inject logo into all generated report documents.', enabled: toggles.pdf },
+                   { id: 'clientDomain', label: 'Enable Client Domain', desc: 'Map this dashboard to your custom agency subdomain.', enabled: toggles.clientDomain },
                  ].map((item, i) => (
                    <div key={i} className="p-4 rounded-2xl border border-[#F9F7F4] flex justify-between items-center group">
                       <div>
-                        <p className="text-xs font-bold text-[#3E1510]">{item.label}</p>
+                        <p id={`toggle-label-${item.id}`} className="text-xs font-bold text-[#3E1510]">{item.label}</p>
                         <p className="text-[10px] text-[#A88C87] mt-1">{item.desc}</p>
                       </div>
-                      <div className={`w-10 h-5 rounded-full relative transition-colors ${item.enabled ? 'bg-[#2E6B3B]' : 'bg-[#EAE3D9]'}`}>
+                      <button 
+                         role="switch" 
+                         aria-checked={item.enabled}
+                         aria-labelledby={`toggle-label-${item.id}`}
+                         onClick={() => setToggles(p => ({ ...p, [item.id]: !item.enabled }))}
+                         className={`w-10 h-5 rounded-full relative transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7A2B20] focus-visible:ring-offset-2 ${item.enabled ? 'bg-[#2E6B3B]' : 'bg-[#EAE3D9]'}`}
+                      >
                         <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${item.enabled ? 'right-1' : 'left-1'}`} />
-                      </div>
+                      </button>
                    </div>
                  ))}
               </div>
@@ -191,7 +204,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
         )}
 
         {activeTab === 'security' && (
-          <div className="py-20 flex flex-col items-center justify-center text-center">
+          <div role="tabpanel" id="panel-security" aria-labelledby="tab-security" className="py-20 flex flex-col items-center justify-center text-center">
             <Shield size={64} className="text-[#A88C87] mb-6 opacity-20" />
             <h3 className="text-xl font-bold text-[#3E1510]">Enhanced Security Layer</h3>
             <p className="text-[#5C4541] mt-2 max-w-sm">
@@ -201,7 +214,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
         )}
 
         {activeTab === 'billing' && (
-          <div className="py-20 flex flex-col items-center justify-center text-center">
+          <div role="tabpanel" id="panel-billing" aria-labelledby="tab-billing" className="py-20 flex flex-col items-center justify-center text-center">
             <CreditCard size={64} className="text-[#A88C87] mb-6 opacity-20" />
             <h3 className="text-xl font-bold text-[#3E1510]">Agency Pro Plan</h3>
             <p className="text-[#5C4541] mt-2 max-w-sm">

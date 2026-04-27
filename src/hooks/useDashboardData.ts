@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchPlatformData } from '../utils/api';
+import { auth, db } from '../lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 /**
  * A custom React hook to manage the data lifecycle for our dashboard components.
@@ -31,9 +33,28 @@ export function useDashboardData<T>(
       setIsLive(false);
 
       try {
+        let accessToken: string | undefined;
+
+        // Fetch real token from Firestore if user is authenticated
+        if (auth.currentUser) {
+           const platformMap: Record<string, string> = { ga4: 'ga4', gsc: 'search_console', youtube: 'youtube', meta: 'meta_ads', tiktok: 'tiktok_ads', email: 'klaviyo', executive: 'executive' };
+           const dbPlatform = platformMap[platform] || platform;
+           
+           const q = query(
+             collection(db, `users/${auth.currentUser.uid}/connectors`),
+             where("platformId", "==", dbPlatform),
+             where("status", "==", "active")
+           );
+           const snapshot = await getDocs(q);
+           if (!snapshot.empty) {
+              const doc = snapshot.docs[0];
+              accessToken = doc.data().accessToken;
+           }
+        }
+
         // Attempt to fetch live data from the internal GAS bridge
         // Passing date parameters to the API utility
-        const fetchedResult = await fetchPlatformData(platform, dateRange);
+        const fetchedResult = await fetchPlatformData(platform, dateRange, accessToken);
         
         if (isMounted) {
           // If successful, cast and set the live data

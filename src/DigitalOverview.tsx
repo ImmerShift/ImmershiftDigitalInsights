@@ -162,6 +162,8 @@ export default function DigitalOverview({
 
         {anomaly && (
           <motion.div 
+            role="alert"
+            aria-live="assertive"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             className={`p-4 rounded-2xl border flex items-start gap-4 ${
@@ -198,6 +200,7 @@ export default function DigitalOverview({
             )}
 
             {/* KPIs */}
+            <h2 className="sr-only">Key Performance Indicators</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
               {kpis.map((kpi, idx) => (
                 <KpiCard key={idx} {...kpi} />

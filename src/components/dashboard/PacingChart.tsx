@@ -76,10 +76,35 @@ export const PacingChart: React.FC<PacingChartProps> = ({
         </div>
       </div>
       
-      <div className="h-[350px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAE3D9" />
+      <div className="h-[350px] w-full" role="img" aria-label={`Pacing chart showing ${primaryLabel} vs ${secondaryLabel}`}>
+        {(!data || data.length === 0) ? (
+          <div className="h-[300px] flex items-center justify-center text-[#A88C87] font-medium border-2 border-dashed border-[#EAE3D9] rounded-2xl">
+            No data available for the selected date range.
+          </div>
+        ) : (
+          <>
+            <table className="sr-only">
+              <caption>Data for {primaryLabel} vs {secondaryLabel}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">{primaryLabel}</th>
+                  <th scope="col">{secondaryLabel}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((d, i) => (
+                  <tr key={i}>
+                    <td>{d.date}</td>
+                    <td>{d[primaryKey]}</td>
+                    <td>{d[secondaryKey]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAE3D9" />
             <XAxis 
               dataKey="date" 
               stroke="#A88C87" 
@@ -135,9 +160,11 @@ export const PacingChart: React.FC<PacingChartProps> = ({
               strokeWidth={4} 
               dot={false}
               activeDot={{ r: 6, fill: 'var(--color-brand-primary)', stroke: '#fff', strokeWidth: 2 }}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+          </>
+        )}
       </div>
     </div>
   );

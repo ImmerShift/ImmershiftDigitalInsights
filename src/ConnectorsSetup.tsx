@@ -165,6 +165,9 @@ export default function ConnectorsSetup() {
   const [authenticatingPlatform, setAuthenticatingPlatform] = useState<string | null>(null);
   const [accountSelectionModal, setAccountSelectionModal] = useState<string | null>(null);
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
+  const [fetchedAccounts, setFetchedAccounts] = useState<any[]>([]);
+  const [fetchedToken, setFetchedToken] = useState<string | null>(null);
+  const [deleteConfirmConnId, setDeleteConfirmConnId] = useState<string | null>(null);
 
   const handleRefresh = async (connId: string) => {
     if (!auth.currentUser) return;
@@ -187,12 +190,15 @@ export default function ConnectorsSetup() {
   };
 
   const handleDelete = async (connId: string) => {
-    if (!auth.currentUser) return;
-    if (!confirm('Are you sure you want to disconnect this account?')) return;
-    
-    const path = `users/${auth.currentUser.uid}/connectors/${connId}`;
+    setDeleteConfirmConnId(connId);
+  };
+
+  const confirmDelete = async () => {
+    if (!auth.currentUser || !deleteConfirmConnId) return;
+    const path = `users/${auth.currentUser.uid}/connectors/${deleteConfirmConnId}`;
     try {
       await deleteDoc(doc(db, path));
+      setDeleteConfirmConnId(null);
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, path);
     }
@@ -207,6 +213,9 @@ export default function ConnectorsSetup() {
       google_ads: 'google',
       search_console: 'google',
       meta_ads: 'meta',
+      ig_insights: 'meta',
+      tiktok_ads: 'tiktok',
+      klaviyo: 'klaviyo'
     };
 
     const backendPlatform = platformMap[platformId] || platformId;
@@ -233,14 +242,36 @@ export default function ConnectorsSetup() {
       }
 
       // 3. Listen for success message from callback window
-      const handleMessage = (event: MessageEvent) => {
+      const handleMessage = async (event: MessageEvent) => {
         if (event.origin !== window.location.origin) return;
         
         if (event.data.type === 'OAUTH_SUCCESS' && event.data.platform === backendPlatform) {
           window.removeEventListener('message', handleMessage);
-          setAuthenticatingPlatform(null);
-          setAccountSelectionModal(platformId);
-          setSelectedAccounts([]);
+          
+          try {
+             // Exchange code for token and get accounts
+             const res = await fetch(`/api/auth/${backendPlatform}/exchange-and-accounts`, {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ code: event.data.code })
+             });
+             if (!res.ok) {
+               const errData = await res.json();
+               throw new Error(errData.error || 'Failed to exchange token');
+             }
+             
+             const { access_token, accounts } = await res.json();
+             
+             setFetchedToken(access_token);
+             setFetchedAccounts(accounts || []);
+             setAuthenticatingPlatform(null);
+             setAccountSelectionModal(platformId);
+             setSelectedAccounts([]);
+          } catch (error: any) {
+             console.error("Exchange error:", error);
+             alert(error.message || 'Failed to fetch accounts from platform.');
+             setAuthenticatingPlatform(null);
+          }
         }
       };
 
@@ -265,23 +296,21 @@ export default function ConnectorsSetup() {
   const handleSaveAccounts = async () => {
     if (!accountSelectionModal || !auth.currentUser) return;
 
-    const platform = AVAILABLE_PLATFORMS.find(p => p.id === accountSelectionModal);
-    const subAccounts = MOCK_SUB_ACCOUNTS[accountSelectionModal] || [{ name: 'Default Account', id: 'default-123' }];
-    
     try {
       const newConnections: ConnectedAccount[] = await Promise.all(selectedAccounts.map(async accId => {
-        const accDetails = subAccounts.find(a => a.id === accId);
+        const accDetails = fetchedAccounts.find(a => a.id === accId);
         const data = {
           platformId: accountSelectionModal,
           accountName: accDetails ? accDetails.name : 'Unknown Account',
           accountId: accId,
-          accessToken: 'MOCK_TOKEN_' + Math.random().toString(36).substring(7),
+          accessToken: fetchedToken || 'NO_TOKEN', // The real token from OAuth
           connectedAt: serverTimestamp(),
           status: 'active'
         };
 
         const path = `users/${auth.currentUser?.uid}/connectors`;
         try {
+          // In a real app we'd encrypt the token before storing, but here we store as-is
           await addDoc(collection(db, path), data);
         } catch (err) {
           handleFirestoreError(err, OperationType.CREATE, path);
@@ -302,7 +331,7 @@ export default function ConnectorsSetup() {
   };
 
   const currentPlatformDetails = AVAILABLE_PLATFORMS.find(p => p.id === accountSelectionModal);
-  const availableTargetAccounts = accountSelectionModal ? (MOCK_SUB_ACCOUNTS[accountSelectionModal] || [{ name: 'Default Account', id: 'default-123' }]) : [];
+  const availableTargetAccounts = accountSelectionModal ? fetchedAccounts : [];
 
   const groupedPlatforms = AVAILABLE_PLATFORMS.reduce((acc, platform) => {
     if (!acc[platform.category]) acc[platform.category] = [];
@@ -364,14 +393,14 @@ export default function ConnectorsSetup() {
 
             {/* Connections Table */}
             <div className="bg-white rounded-2xl border border-[#EAE3D9] shadow-sm overflow-hidden overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[700px]">
+              <table aria-label="Active platform connections" className="w-full text-left border-collapse min-w-[700px]">
                 <thead>
                   <tr className="bg-[#FDF8F3] border-b border-[#EAE3D9]">
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541]">Platform</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541]">Authenticated Account</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541]">ID / Reference</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541]">Status</th>
-                    <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541] text-right">Actions</th>
+                    <th scope="col" className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541]">Platform</th>
+                    <th scope="col" className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541]">Authenticated Account</th>
+                    <th scope="col" className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541]">ID / Reference</th>
+                    <th scope="col" className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541]">Status</th>
+                    <th scope="col" className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-[#5C4541] text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#EAE3D9]">
@@ -436,7 +465,8 @@ export default function ConnectorsSetup() {
                               <div className={`w-1.5 h-1.5 rounded-full ${
                                 isSyncing ? 'bg-amber-400 animate-pulse' :
                                 isError ? 'bg-red-500' : 'bg-green-500'
-                              }`} />
+                              }`} aria-hidden="true" />
+                              <span className="sr-only">Status: {isSyncing ? 'Syncing' : isError ? 'Error' : 'Connected'}</span>
                               <span className={`text-xs font-bold ${
                                 isSyncing ? 'text-amber-600' :
                                 isError ? 'text-red-700' : 'text-green-700'
@@ -446,18 +476,18 @@ export default function ConnectorsSetup() {
                             </div>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
                               <button 
                                 onClick={() => handleRefresh(conn.id)}
                                 disabled={isSyncing}
-                                className={`p-1.5 rounded-lg transition-colors ${isSyncing ? 'text-[#DDA77B]' : 'hover:bg-[#F5E1C8] text-[#7A2B20]'}`}
+                                className={`p-1.5 rounded-lg transition-colors focus:outline-2 focus:outline-offset-2 focus:outline-brand-primary ${isSyncing ? 'text-[#DDA77B]' : 'hover:bg-[#F5E1C8] text-[#7A2B20]'}`}
                                 title="Refresh Sync"
                               >
                                 <RefreshCcw size={14} className={isSyncing ? 'animate-spin' : ''} />
                               </button>
                               <button 
                                 onClick={() => handleDelete(conn.id)}
-                                className="p-1.5 hover:bg-red-50 text-red-500 rounded-lg transition-colors"
+                                className="p-1.5 hover:bg-red-50 text-red-500 rounded-lg transition-colors focus:outline-2 focus:outline-offset-2 focus:outline-red-500"
                                 title="Remove Connection"
                               >
                                 <X size={14} />
@@ -556,7 +586,16 @@ export default function ConnectorsSetup() {
 
       {/* Account Selection Modal Overlay */}
       {accountSelectionModal && (
-        <div className="fixed inset-0 bg-[#3E1510]/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4">
+        <div 
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+          tabIndex={-1}
+          onKeyDown={(e) => {
+             if (e.key === 'Escape') setAccountSelectionModal(null);
+          }}
+          className="fixed inset-0 bg-[#3E1510]/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4 outline-none"
+        >
           <div className="w-[520px] max-w-full bg-white rounded-[2rem] shadow-2xl border border-[#EAE3D9] overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
             
             <div className="bg-[#FDF8F3] px-6 sm:px-8 py-6 border-b border-[#EAE3D9] flex items-center justify-between shrink-0">
@@ -568,7 +607,7 @@ export default function ConnectorsSetup() {
                      currentPlatformDetails?.name.charAt(0)}
                   </div>
                 <div>
-                  <h3 className="font-bold text-lg leading-tight text-[#3E1510]">{currentPlatformDetails?.name}</h3>
+                  <h3 id="modal-title" className="font-bold text-lg leading-tight text-[#3E1510]">{currentPlatformDetails?.name}</h3>
                   <p className="text-xs text-[#5C4541] font-bold uppercase tracking-wider mt-0.5">Account Selection</p>
                 </div>
               </div>
@@ -597,9 +636,11 @@ export default function ConnectorsSetup() {
               <div className="space-y-3">
                 {availableTargetAccounts.map(account => {
                     const isSelected = selectedAccounts.includes(account.id);
+                    const checkId = `account-${account.id}`;
                     return (
                       <label 
                         key={account.id}
+                        htmlFor={checkId}
                         className={`group flex items-center justify-between p-5 rounded-2xl cursor-pointer transition-all ${
                           isSelected
                             ? 'border-2 border-brand-primary bg-[#FDF8F3] shadow-md -translate-y-0.5'
@@ -623,6 +664,7 @@ export default function ConnectorsSetup() {
                         </div>
                          {/* Hidden input for accessibility/forms if needed */}
                         <input 
+                            id={checkId}
                             type="checkbox" 
                             className="sr-only"
                             checked={isSelected}
@@ -656,6 +698,34 @@ export default function ConnectorsSetup() {
               </button>
             </div>
             
+          </div>
+        </div>
+      )}
+      {/* Delete Confirmation Modal Overlay */}
+      {deleteConfirmConnId && (
+        <div 
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-modal-title"
+          className="fixed inset-0 bg-[#3E1510]/40 backdrop-blur-[2px] flex items-center justify-center z-50 p-4"
+        >
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-[#EAE3D9]">
+            <h3 id="delete-modal-title" className="text-xl font-bold text-[#3E1510] mb-2">Disconnect Account?</h3>
+            <p className="text-[#5C4541] mb-6">Are you sure you want to disconnect this account? This action cannot be undone and will stop data synchronization.</p>
+            <div className="flex gap-3 justify-end">
+               <button 
+                 onClick={() => setDeleteConfirmConnId(null)}
+                 className="px-4 py-2 font-bold text-[#5C4541] hover:bg-[#F9F7F4] rounded-xl transition-colors"
+               >
+                 Cancel
+               </button>
+               <button 
+                 onClick={confirmDelete}
+                 className="px-4 py-2 font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md transition-colors"
+               >
+                 Confirm Disconnect
+               </button>
+            </div>
           </div>
         </div>
       )}

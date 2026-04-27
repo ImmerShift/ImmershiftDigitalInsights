@@ -32,6 +32,28 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate, onAiAs
     a.label.toLowerCase().includes(query.toLowerCase())
   );
 
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (filteredActions.length > 0) {
+        setSelectedIndex(prev => (prev + 1) % filteredActions.length);
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (filteredActions.length > 0) {
+        setSelectedIndex(prev => (prev - 1 + filteredActions.length) % filteredActions.length);
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredActions.length > 0) {
+        handleSelect(filteredActions[selectedIndex].id);
+      } else {
+        onAiAsk(query);
+        setIsOpen(false);
+      }
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -67,27 +89,39 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate, onAiAs
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: -20 }}
             className="fixed top-[20%] left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-[#EAE3D9] z-[101] overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Command Center"
           >
             <div className="flex items-center px-6 border-b border-[#F9F7F4]">
               <Search className="text-[#A88C87]" size={20} />
               <input 
                 autoFocus
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
+                onKeyDown={handleInputKeyDown}
                 placeholder="Type a command or ask a question..."
                 className="w-full h-16 px-4 bg-transparent border-none focus:ring-0 text-[#3E1510] font-medium"
+                role="combobox"
+                aria-expanded={filteredActions.length > 0}
+                aria-controls="command-options"
+                aria-activedescendant={filteredActions.length > 0 ? `action-${filteredActions[selectedIndex]?.id}` : undefined}
               />
               <div className="flex items-center gap-1 px-2 py-1 bg-[#F9F7F4] rounded-lg text-[#A88C87] text-[10px] font-black uppercase">
                  <CommandIcon size={10} /> K
               </div>
             </div>
 
-            <div className="max-h-[400px] overflow-y-auto p-2">
+            <div className="max-h-[400px] overflow-y-auto p-2" id="command-options" role="listbox">
               {filteredActions.length > 0 ? (
                 <div className="space-y-1">
                   {filteredActions.map((action, i) => (
                     <button
                       key={action.id}
+                      id={`action-${action.id}`}
+                      role="option"
+                      aria-selected={selectedIndex === i}
+                      tabIndex={-1}
                       onClick={() => handleSelect(action.id)}
                       onMouseEnter={() => setSelectedIndex(i)}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${selectedIndex === i ? 'bg-[#FDF8F3] text-[#7A2B20]' : 'text-[#5C4541] hover:bg-[#F9F7F4]'}`}

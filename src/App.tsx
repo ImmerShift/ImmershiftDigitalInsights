@@ -30,6 +30,7 @@ import { MessageSquare, Sparkles } from 'lucide-react';
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('executive');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [activeContext, setActiveContext] = useState<any>(null);
   const [language, setLanguage] = useState<'en' | 'id'>('en');
   const [user, setUser] = useState<any>(null);
@@ -131,7 +132,11 @@ export default function App() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-[#F9F7F4] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#7A2B20]/20 border-t-[#7A2B20] rounded-full animate-spin" />
+        <div 
+          role="status" 
+          aria-label="Loading, please wait" 
+          className="w-12 h-12 border-4 border-[#7A2B20]/20 border-t-[#7A2B20] rounded-full animate-spin" 
+        />
       </div>
     );
   }
@@ -146,31 +151,53 @@ export default function App() {
 
   return (
     <div className="flex bg-[#F9F7F4] min-h-screen">
+      <a href="#main-data" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[100] bg-white px-4 py-2 font-bold ring-2 ring-brand-primary">
+        Skip to main content
+      </a>
+
       <Sidebar 
         currentView={currentView} 
         onViewChange={setCurrentView} 
         user={user}
         logoUrl={logoUrl}
         onLogout={handleLogout}
+        isOpen={isNavOpen}
+        onClose={() => setIsNavOpen(false)}
       />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
         {/* Global Toolbar */}
-        <header className="h-16 bg-white border-b border-[#EAE3D9] flex items-center justify-between px-8 shrink-0 z-50">
-          <div className="flex items-center gap-6">
-            <h2 className="font-serif font-black text-[#3E1510] tracking-tight">
+        <header className="h-16 bg-white border-b border-[#EAE3D9] flex items-center justify-between px-4 sm:px-8 shrink-0 z-40">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <button 
+              onClick={() => setIsNavOpen(prev => !prev)}
+              aria-label={isNavOpen ? "Close navigation" : "Open navigation"}
+              aria-expanded={isNavOpen}
+              className="lg:hidden p-2 text-[#3E1510] hover:bg-[#F9F7F4] rounded-lg"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <h2 className="font-serif font-black text-[#3E1510] tracking-tight truncate max-w-[120px] sm:max-w-none">
               {currentView.replace('-', ' ').toUpperCase()}
             </h2>
-            <div className="h-4 w-px bg-[#EAE3D9]" />
-            <div className="flex gap-2">
+            <div className="hidden sm:block h-4 w-px bg-[#EAE3D9]" />
+            <div className="hidden sm:flex gap-2">
               <button 
                 onClick={() => setLanguage('en')}
+                aria-pressed={language === 'en'}
+                aria-label="Switch to English"
                 className={`px-2 py-1 rounded text-[10px] font-black tracking-widest uppercase transition-colors ${language === 'en' ? 'bg-[#3E1510] text-white' : 'text-[#A88C87] hover:bg-[#F9F7F4]'}`}
               >
                 EN
               </button>
               <button 
                 onClick={() => setLanguage('id')}
+                aria-pressed={language === 'id'}
+                aria-label="Switch to Indonesian"
                 className={`px-2 py-1 rounded text-[10px] font-black tracking-widest uppercase transition-colors ${language === 'id' ? 'bg-[#3E1510] text-white' : 'text-[#A88C87] hover:bg-[#F9F7F4]'}`}
               >
                 ID
@@ -190,7 +217,7 @@ export default function App() {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto relative bg-[#F9F7F4]">
+        <main id="main-data" tabIndex={-1} className="flex-1 overflow-y-auto relative bg-[#F9F7F4] focus:outline-none">
           {currentView === 'executive' && <DigitalOverview onDataLoaded={handleContextUpdate} dateRange={dateRange} />}
           {currentView === 'scratchpad' && (
             <div className="p-8 max-w-7xl mx-auto w-full">

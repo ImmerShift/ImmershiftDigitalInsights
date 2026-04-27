@@ -106,10 +106,11 @@ export const BudgetOptimizer: React.FC<BudgetOptimizerProps> = ({ business, chan
           <div className="space-y-8">
             <div>
               <div className="flex justify-between items-end mb-4">
-                <label className="text-sm font-medium text-[#5C4541]">Scale Total Monthly Budget</label>
+                <label htmlFor="budget-simulator" className="text-sm font-medium text-[#5C4541]">Scale Total Monthly Budget</label>
                 <span className="text-2xl font-black text-brand-primary">+{simulatorValue}%</span>
               </div>
               <input 
+                id="budget-simulator"
                 type="range" 
                 min="-50" 
                 max="100" 

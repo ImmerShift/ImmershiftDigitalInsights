@@ -46,11 +46,13 @@ export const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin 
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Full Name</label>
+            <label htmlFor="register-name" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Full Name</label>
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
               <input 
+                id="register-name"
                 type="text" 
+                autoComplete="name"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -61,11 +63,13 @@ export const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin 
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Agency Email</label>
+            <label htmlFor="register-email" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Agency Email</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
               <input 
+                id="register-email"
                 type="email" 
+                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -76,11 +80,13 @@ export const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin 
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Password</label>
+            <label htmlFor="register-password" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Password</label>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
               <input 
+                id="register-password"
                 type="password" 
+                autoComplete="new-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -91,7 +97,7 @@ export const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin 
           </div>
 
           {error && (
-            <p className="text-[10px] font-bold text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2">
+            <p role="alert" aria-live="assertive" className="text-[10px] font-bold text-red-600 bg-red-50 p-3 rounded-xl border border-red-100 flex items-center gap-2">
               <ShieldCheck size={14} /> {error}
             </p>
           )}

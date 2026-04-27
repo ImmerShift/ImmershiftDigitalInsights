@@ -1,14 +1,18 @@
 const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzz2UV_EPrpFUKlxIyQ71KaVlKihSxXrgAOPbnGPLhn__0LPDier3lEH4z0KoAtiqLnog/exec';
 
 /**
- * Fetches platform-specific marketing data from our Google Apps Script middleware.
+ * Fetches platform-specific marketing data from our Google Apps Script middleware,
+ * or handles a direct API call if preferred.
  * 
  * @param platform The marketing platform to fetch data for.
- * @returns Parsed JSON data from the Google Apps Script.
+ * @param dateRange The date range object
+ * @param accessToken Real access token retrieved from user's Firestore connectors
+ * @returns Parsed JSON data from the middleware.
  */
 export async function fetchPlatformData(
   platform: 'ga4' | 'gsc' | 'youtube' | 'meta' | 'tiktok' | 'email' | 'executive',
-  dateRange?: { startDate: string; endDate: string }
+  dateRange?: { startDate: string; endDate: string },
+  accessToken?: string
 ) {
   try {
     // Construct the URL with the platform query parameter for the Apps Script routing
@@ -16,6 +20,11 @@ export async function fetchPlatformData(
     
     if (dateRange) {
       url += `&startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`;
+    }
+
+    if (accessToken && accessToken !== 'NO_TOKEN' && !accessToken.startsWith('MOCK')) {
+       // Passing token to the GAS router natively
+       url += `&auth_token=${encodeURIComponent(accessToken)}`;
     }
     
     // Google Apps Script requires following redirects to handle CORS properly.

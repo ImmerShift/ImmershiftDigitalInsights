@@ -30,11 +30,11 @@ export const ChannelEconomicsTable: React.FC<ChannelEconomicsTableProps> = ({ ti
         <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
             <tr>
-              <th className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Channel</th>
-              <th className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">{labels.metric1}</th>
-              <th className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">{labels.metric2}</th>
-              <th className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">{labels.efficiency}</th>
-              <th className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider w-64">Distribution</th>
+              <th scope="col" className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Channel</th>
+              <th scope="col" className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">{labels.metric1}</th>
+              <th scope="col" className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">{labels.metric2}</th>
+              <th scope="col" className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">{labels.efficiency}</th>
+              <th scope="col" className="bg-[#FDF8F3] px-6 py-4 text-xs font-bold text-[#A88C87] uppercase tracking-wider w-64">Distribution</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#EAE3D9]">
