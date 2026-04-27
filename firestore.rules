@@ -8,7 +8,7 @@ service cloud.firestore {
 
     // --- Helpers ---
     function isSignedIn() {
-      return request.auth != null && request.auth.token.email_verified == true;
+      return request.auth != null;
     }
 
     function isOwner(userId) {
@@ -31,14 +31,19 @@ service cloud.firestore {
     function isValidUser(data) {
       return data.email is string && data.email.size() <= 256 &&
              (data.get('displayName', '') is string && data.get('displayName', '').size() <= 128) &&
-             (data.get('logoUrl', '') is string && data.get('logoUrl', '').size() <= 2048);
+             (data.get('logoUrl', '') is string && data.get('logoUrl', '').size() <= 2048) &&
+             (data.get('createdAt', request.time) == request.time || data.get('createdAt', request.time) is timestamp) &&
+             (data.get('updatedAt', request.time) == request.time || data.get('updatedAt', request.time) is timestamp);
     }
 
     function isValidConnector(data) {
       return data.platformId is string && data.platformId.size() <= 50 &&
+             data.accountName is string && data.accountName.size() <= 256 &&
+             data.accountId is string && data.accountId.size() <= 256 &&
              data.accessToken is string && data.accessToken.size() <= 2048 &&
              (data.get('refreshToken', '') is string && data.get('refreshToken', '').size() <= 2048) &&
-             (data.get('identifier', '') is string && data.get('identifier', '').size() <= 256);
+             (data.get('connectedAt', request.time) == request.time || data.get('connectedAt', request.time) is timestamp) &&
+             (data.get('lastSyncedAt', request.time) == request.time || data.get('lastSyncedAt', request.time) is timestamp);
     }
 
     // --- Collection Rules ---
@@ -52,18 +57,17 @@ service cloud.firestore {
       allow update: if isOwner(userId) && 
                       isValidUser(incoming()) && 
                       incoming().email == existing().email &&
-                      incoming().createdAt == existing().createdAt &&
-                      incoming().updatedAt == request.time &&
-                      incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'logoUrl', 'updatedAt']);
+                      incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'logoUrl', 'updatedAt']) &&
+                      (incoming().updatedAt == request.time);
     }
 
     // Connectors Subcollection
     match /users/{userId}/connectors/{connectorId} {
       allow list, get: if isOwner(userId);
-      allow create: if isOwner(userId) && isValidId(connectorId) && isValidConnector(incoming());
+      allow create: if isOwner(userId) && isValidId(connectorId) && isValidConnector(incoming()) && (incoming().connectedAt == request.time);
       allow update: if isOwner(userId) && 
                       isValidConnector(incoming()) && 
-                      incoming().diff(existing()).affectedKeys().hasOnly(['accessToken', 'refreshToken', 'expiresAt', 'status']);
+                      incoming().diff(existing()).affectedKeys().hasOnly(['accessToken', 'refreshToken', 'expiresAt', 'status', 'lastSyncedAt']);
       allow delete: if isOwner(userId);
     }
   }

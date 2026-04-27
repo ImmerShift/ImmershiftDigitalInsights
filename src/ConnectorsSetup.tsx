@@ -11,11 +11,13 @@ import {
   Loader2,
   X,
   AlertCircle,
-  Link2
+  Link2,
+  RefreshCcw,
+  Clock
 } from 'lucide-react';
 
 import { db, auth } from './lib/firebase';
-import { collection, addDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from './utils/firebaseErrors';
 
 export interface Platform {
@@ -31,8 +33,9 @@ export interface ConnectedAccount {
   platformId: string;
   accountName: string;
   accountId: string;
-  connectedAt: string;
-  status: 'active' | 'error';
+  connectedAt: any;
+  lastSyncedAt?: any;
+  status: 'active' | 'error' | 'syncing';
 }
 
 const AVAILABLE_PLATFORMS: Platform[] = [
@@ -163,6 +166,38 @@ export default function ConnectorsSetup() {
   const [accountSelectionModal, setAccountSelectionModal] = useState<string | null>(null);
   const [selectedAccounts, setSelectedAccounts] = useState<string[]>([]);
 
+  const handleRefresh = async (connId: string) => {
+    if (!auth.currentUser) return;
+    const path = `users/${auth.currentUser.uid}/connectors/${connId}`;
+    try {
+      await updateDoc(doc(db, path), {
+        status: 'syncing'
+      });
+      
+      // Simulate real-time data fetch delay
+      setTimeout(async () => {
+        await updateDoc(doc(db, path), {
+          status: 'active',
+          lastSyncedAt: serverTimestamp()
+        });
+      }, 3000);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, path);
+    }
+  };
+
+  const handleDelete = async (connId: string) => {
+    if (!auth.currentUser) return;
+    if (!confirm('Are you sure you want to disconnect this account?')) return;
+    
+    const path = `users/${auth.currentUser.uid}/connectors/${connId}`;
+    try {
+      await deleteDoc(doc(db, path));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, path);
+    }
+  };
+
   const handleConnect = async (platformId: string) => {
     setAuthenticatingPlatform(platformId);
     
@@ -241,7 +276,7 @@ export default function ConnectorsSetup() {
           accountName: accDetails ? accDetails.name : 'Unknown Account',
           accountId: accId,
           accessToken: 'MOCK_TOKEN_' + Math.random().toString(36).substring(7),
-          connectedAt: new Date().toISOString(),
+          connectedAt: serverTimestamp(),
           status: 'active'
         };
 
@@ -299,16 +334,32 @@ export default function ConnectorsSetup() {
           <>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-[#3E1510]">Data Sources</h1>
-                <p className="text-[#5C4541] mt-1">Manage your active connections and data synchronization pipelines.</p>
+                <h1 className="text-3xl font-serif font-black text-[#3E1510]">Data Sources</h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-[#5C4541]">Manage your active connections and data synchronization pipelines.</p>
+                  <div className="h-3 w-px bg-[#EAE3D9]" />
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#A88C87]">All Systems Operational</span>
+                  </div>
+                </div>
               </div>
-              <button 
-                onClick={() => setCurrentView('marketplace')}
-                className="px-6 py-2.5 bg-[#7A2B20] text-white rounded-xl font-semibold shadow-sm hover:opacity-90 flex items-center gap-2 whitespace-nowrap transition-opacity shrink-0"
-              >
-                <Plus size={20} strokeWidth={2.5} />
-                + Add Data Source
-              </button>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => activeConnections.forEach(c => handleRefresh(c.id))}
+                  className="px-4 py-2.5 bg-white border border-[#EAE3D9] text-[#3E1510] rounded-xl font-bold text-xs shadow-sm hover:bg-[#FDF8F3] flex items-center gap-2 transition-all"
+                >
+                  <RefreshCcw size={14} />
+                  Sync All
+                </button>
+                <button 
+                  onClick={() => setCurrentView('marketplace')}
+                  className="px-6 py-2.5 bg-[#3E1510] text-white rounded-xl font-bold text-xs shadow-sm hover:opacity-90 flex items-center gap-2 whitespace-nowrap transition-opacity shrink-0"
+                >
+                  <Plus size={18} strokeWidth={3} />
+                  Add Data Source
+                </button>
+              </div>
             </div>
 
             {/* Connections Table */}
@@ -345,8 +396,10 @@ export default function ConnectorsSetup() {
                       const platform = AVAILABLE_PLATFORMS.find(p => p.id === conn.platformId);
                       const Icon = platform?.icon || BarChart3;
                       const isError = conn.status === 'error';
+                      const isSyncing = conn.status === 'syncing';
+
                       return (
-                        <tr key={conn.id} className={`hover:bg-[#FDF8F3]/50 transition-colors ${isError ? 'opacity-60 text-opacity-100 hover:opacity-100' : ''}`}>
+                        <tr key={conn.id} className={`hover:bg-[#FDF8F3]/50 transition-colors group ${isError ? 'opacity-60' : ''}`}>
                           <td className="px-6 py-4 flex items-center gap-3">
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm overflow-hidden shrink-0 ${
                                 isError ? 'bg-red-50 text-red-600' :
@@ -358,27 +411,58 @@ export default function ConnectorsSetup() {
                                  platform?.id === 'google_ads' || platform?.id === 'ga4' || platform?.id === 'search_console' ? 'G' : 
                                  <Icon size={16} />}
                             </div>
-                            <span className="font-semibold">{platform?.name || 'Unknown Platform'}</span>
+                            <span className="font-semibold text-[#3E1510]">{platform?.name || 'Unknown Platform'}</span>
                           </td>
-                          <td className="px-6 py-4 font-medium">{conn.accountName}</td>
-                          <td className="px-6 py-4 text-[#5C4541] font-mono text-xs">{conn.accountId}</td>
                           <td className="px-6 py-4">
-                            {isError ? (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold">
-                                <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                                Error
+                            <div className="flex flex-col">
+                              <span className="font-medium text-[#3E1510]">{conn.accountName}</span>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <Clock size={10} className="text-[#A88C87]" />
+                                <span className="text-[9px] font-bold text-[#A88C87]">
+                                  {conn.lastSyncedAt 
+                                    ? `Last synced: ${typeof conn.lastSyncedAt === 'object' && conn.lastSyncedAt.toDate 
+                                        ? conn.lastSyncedAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                        : new Date(conn.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                    : 'Pending first sync'}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-[#5C4541] font-mono text-xs">
+                             <span className="bg-[#EAE3D9]/30 px-2 py-0.5 rounded">{conn.accountId}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-1.5 h-1.5 rounded-full ${
+                                isSyncing ? 'bg-amber-400 animate-pulse' :
+                                isError ? 'bg-red-500' : 'bg-green-500'
+                              }`} />
+                              <span className={`text-xs font-bold ${
+                                isSyncing ? 'text-amber-600' :
+                                isError ? 'text-red-700' : 'text-green-700'
+                              }`}>
+                                {isSyncing ? 'Syncing...' : isError ? 'Error' : 'Connected'}
                               </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold">
-                                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                                Connected
-                              </span>
-                            )}
+                            </div>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <button className="p-2 text-[#5C4541] hover:text-[#7A2B20] outline-none rounded-lg focus:bg-[#EAE3D9]/50 transition-colors">
-                              <MoreVertical size={20} strokeWidth={2} />
-                            </button>
+                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button 
+                                onClick={() => handleRefresh(conn.id)}
+                                disabled={isSyncing}
+                                className={`p-1.5 rounded-lg transition-colors ${isSyncing ? 'text-[#DDA77B]' : 'hover:bg-[#F5E1C8] text-[#7A2B20]'}`}
+                                title="Refresh Sync"
+                              >
+                                <RefreshCcw size={14} className={isSyncing ? 'animate-spin' : ''} />
+                              </button>
+                              <button 
+                                onClick={() => handleDelete(conn.id)}
+                                className="p-1.5 hover:bg-red-50 text-red-500 rounded-lg transition-colors"
+                                title="Remove Connection"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       );
@@ -497,10 +581,18 @@ export default function ConnectorsSetup() {
               </button>
             </div>
             
-            <div className="p-6 sm:p-8 flex flex-col gap-4 overflow-y-auto min-h-[50px]">
-              <p className="text-sm text-[#5C4541] mb-2 leading-relaxed">
-                Select the advertising accounts you want to connect to ImmerShift.
-              </p>
+            <div className="p-6 sm:p-8 flex flex-col gap-4 overflow-y-auto min-h-[100px]">
+              <div className="bg-[#ECFDF5] border border-[#10B981]/20 p-4 rounded-2xl flex gap-3 mb-2 animate-in fade-in slide-in-from-top-2 duration-500">
+                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
+                    <CheckCircle2 size={20} className="text-[#10B981]" />
+                 </div>
+                 <div className="space-y-1">
+                    <p className="text-xs font-black text-[#065F46] uppercase tracking-widest">Live Connection Active</p>
+                    <p className="text-[11px] text-[#065F46]/80 leading-relaxed font-medium">
+                      Select advertising accounts to sync data pipelines.
+                    </p>
+                 </div>
+              </div>
               
               <div className="space-y-3">
                 {availableTargetAccounts.map(account => {
@@ -508,22 +600,26 @@ export default function ConnectorsSetup() {
                     return (
                       <label 
                         key={account.id}
-                        className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${
+                        className={`group flex items-center justify-between p-5 rounded-2xl cursor-pointer transition-all ${
                           isSelected
-                            ? 'border-2 border-[#7A2B20] bg-[#FDF8F3] shadow-sm'
-                            : 'border-2 border-transparent ring-1 ring-[#EAE3D9] hover:bg-[#F9F7F4] bg-white'
+                            ? 'border-2 border-brand-primary bg-[#FDF8F3] shadow-md -translate-y-0.5'
+                            : 'border border-[#EAE3D9] hover:border-brand-primary/50 hover:bg-[#F9F7F4] bg-white shadow-sm'
                         }`}
                       >
                         <div className="flex flex-col pr-4">
-                          <span className="font-bold text-sm text-[#3E1510] leading-tight mb-1">{account.name}</span>
-                          <span className="text-[11px] text-[#5C4541] font-mono uppercase truncate">{account.id}</span>
+                          <span className={`font-black text-sm leading-tight mb-1 transition-colors ${isSelected ? 'text-brand-primary' : 'text-[#3E1510]'}`}>
+                            {account.name}
+                          </span>
+                          <span className="text-[10px] text-[#A88C87] font-mono tracking-tighter truncate max-w-[240px] uppercase">
+                            ID: {account.id}
+                          </span>
                         </div>
-                        <div className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center transition-colors ${
-                            isSelected 
-                            ? 'bg-[#7A2B20] text-white border-2 border-[#7A2B20]' 
-                            : 'border-2 border-[#EAE3D9] bg-white'
+                        <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                          isSelected 
+                            ? 'bg-brand-primary border-brand-primary text-white scale-110 shadow-lg shadow-brand-primary/20' 
+                            : 'border-[#EAE3D9] group-hover:border-brand-primary/30'
                         }`}>
-                           {isSelected && <CheckCircle2 size={16} strokeWidth={3} />}
+                          {isSelected && <CheckCircle2 size={16} strokeWidth={3} />}
                         </div>
                          {/* Hidden input for accessibility/forms if needed */}
                         <input 
@@ -544,19 +640,19 @@ export default function ConnectorsSetup() {
               </div>
             </div>
 
-            <div className="p-6 sm:p-8 bg-[#FDF8F3] border-t border-[#EAE3D9] flex gap-3 shrink-0">
+            <div className="p-6 sm:p-8 bg-[#F9F7F4] border-t border-[#EAE3D9] flex gap-3 shrink-0">
               <button 
                 onClick={() => setAccountSelectionModal(null)}
-                className="flex-1 py-3 px-4 bg-white border border-[#EAE3D9] rounded-xl text-sm font-bold text-[#5C4541] hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:ring-[#EAE3D9] transition-all outline-none"
+                className="flex-1 py-4 px-4 bg-white border border-[#EAE3D9] rounded-2xl text-[10px] uppercase tracking-widest font-black text-[#5C4541] hover:bg-gray-50 transition-all outline-none"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleSaveAccounts}
                 disabled={selectedAccounts.length === 0}
-                className="flex-[1.5] py-3 px-4 bg-[#7A2B20] text-white rounded-xl text-sm font-bold shadow-lg hover:shadow-xl hover:bg-[#6A241A] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:hover:bg-[#7A2B20] focus:ring-2 focus:ring-offset-2 focus:ring-[#7A2B20] transition-all outline-none"
+                className="flex-[1.5] py-4 px-4 bg-[#3E1510] text-white rounded-2xl text-[10px] uppercase tracking-widest font-black shadow-xl hover:shadow-2xl hover:bg-brand-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all outline-none active:scale-95"
               >
-                Save Accounts {selectedAccounts.length > 0 && `(${selectedAccounts.length})`}
+                Complete Integration {selectedAccounts.length > 0 && `(${selectedAccounts.length})`}
               </button>
             </div>
             

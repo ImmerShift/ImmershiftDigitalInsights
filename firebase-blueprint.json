@@ -11,7 +11,7 @@
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["email", "createdAt"]
+      "required": ["email"]
     },
     "Connector": {
       "title": "Platform Connector",
@@ -19,13 +19,15 @@
       "type": "object",
       "properties": {
         "platformId": { "type": "string" },
-        "identifier": { "type": "string" },
+        "accountName": { "type": "string" },
+        "accountId": { "type": "string" },
         "accessToken": { "type": "string" },
         "refreshToken": { "type": "string" },
-        "expiresAt": { "type": "string", "format": "date-time" },
-        "status": { "type": "string", "enum": ["active", "expired", "revoked"] }
+        "connectedAt": { "type": "string", "format": "date-time" },
+        "lastSyncedAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["active", "expired", "revoked", "syncing"] }
       },
-      "required": ["platformId", "accessToken"]
+      "required": ["platformId", "accessToken", "accountName", "accountId"]
     }
   },
   "firestore": {

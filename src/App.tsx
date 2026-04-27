@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider, sendEmailVerification } from 'firebase/auth';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from './lib/firebase';
 import ConnectorsSetup from './ConnectorsSetup';
 import GscPlatformOverview from './GscPlatformOverview';
@@ -79,7 +79,7 @@ export default function App() {
       await setDoc(doc(db, 'users', cred.user.uid), {
         email: e,
         displayName: n,
-        createdAt: new Date().toISOString(), // This will be validated by rules as request.time
+        createdAt: serverTimestamp(),
         logoUrl: ''
       });
     } catch (err: any) {
@@ -98,7 +98,7 @@ export default function App() {
         await setDoc(doc(db, 'users', cred.user.uid), {
           email: cred.user.email,
           displayName: cred.user.displayName,
-          createdAt: new Date().toISOString(),
+          createdAt: serverTimestamp(),
           logoUrl: ''
         });
       }
@@ -116,7 +116,7 @@ export default function App() {
     try {
       await setDoc(doc(db, 'users', user.uid), { 
         logoUrl: url,
-        updatedAt: new Date().toISOString()
+        updatedAt: serverTimestamp()
       }, { merge: true });
       setLogoUrl(url);
     } catch (err) {
