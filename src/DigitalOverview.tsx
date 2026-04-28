@@ -152,11 +152,6 @@ export default function DigitalOverview({
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#EAE3D9] rounded-xl text-sm font-medium text-[#3E1510] hover:bg-[#FDF8F3] transition-colors shadow-sm">
-              <Calendar size={16} className="text-[#A88C87]" />
-              April 1 - April 15, 2026
-              <ChevronDown size={14} className="ml-1 text-[#A88C87]" />
-            </button>
           </div>
         </div>
 
