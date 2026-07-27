@@ -1,4 +1,5 @@
-const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzz2UV_EPrpFUKlxIyQ71KaVlKihSxXrgAOPbnGPLhn__0LPDier3lEH4z0KoAtiqLnog/exec';
+// Use backend proxy instead of GAS directly to avoid CORS in iframe
+const PROXY_URL = '/api/proxy';
 
 /**
  * Fetches platform-specific marketing data from our Google Apps Script middleware,
@@ -15,23 +16,38 @@ export async function fetchPlatformData(
   accessToken?: string
 ) {
   try {
-    // Construct the URL with the platform query parameter for the Apps Script routing
-    let url = `${GAS_WEB_APP_URL}?platform=${platform}`;
+    if (platform === 'executive') {
+       // Return a simple empty object to satisfy the frontend safely, 
+       // or throw a silent error that the catch block knows not to log.
+       throw new Error("SILENT_EXECUTIVE_BYPASS");
+    }
+    
+    // Map platforms to safe IDs to avoid adblocker network interception
+    const platformMap: Record<string, string> = {
+      ga4: 'p1',
+      gsc: 'p2',
+      youtube: 'p3',
+      meta: 'p4',
+      tiktok: 'p5',
+      email: 'p6'
+    };
+    
+    const safePlatform = platformMap[platform] || platform;
+    
+    // Construct the URL with the platform query parameter for the backend proxy
+    let url = `${PROXY_URL}/${safePlatform}?`;
     
     if (dateRange) {
-      url += `&startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`;
+      url += `startDate=${dateRange.startDate}&endDate=${dateRange.endDate}&`;
     }
 
     if (accessToken && accessToken !== 'NO_TOKEN' && !accessToken.startsWith('MOCK')) {
-       // Passing token to the GAS router natively
-       url += `&auth_token=${encodeURIComponent(accessToken)}`;
+       // Passing token to the server natively
+       url += `auth_token=${encodeURIComponent(accessToken)}&`;
     }
     
-    // Google Apps Script requires following redirects to handle CORS properly.
-    // Using a simple GET request avoids preflight OPTIONS requests which GAS often fails on.
     const response = await fetch(url, {
-      method: 'GET',
-      redirect: 'follow' // Crucial for GAS Web Apps which redirect to script.googleusercontent.com
+      method: 'GET'
     });
 
     if (!response.ok) {
@@ -39,10 +55,14 @@ export async function fetchPlatformData(
     }
 
     const data = await response.json();
+    if (data.error) {
+       throw new Error(`Data Proxy returned error: ${data.error}`);
+    }
     return data;
   } catch (error) {
-    // Log the error for debugging but throw it so the caller (our hook) can handle the fallback
-    console.error(`🚨 Failed to fetch live data for platform: ${platform}`, error);
+    if (error instanceof Error && error.message === "SILENT_EXECUTIVE_BYPASS") {
+      throw error;
+    }
     throw error;
   }
 }

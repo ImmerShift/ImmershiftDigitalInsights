@@ -63,14 +63,18 @@ export function useDashboardData<T>(
         }
       } catch (err: any) {
         if (isMounted) {
-          // CRITICAL SAAS FAILSAFE:
-          // If the fetch fails (network error, Apps Script quota, CORS block),
-          // we log the error, update the error state for optional UI hints,
-          // and forcefully inject the 'mockFallbackData' so the executive dashboard
-          // never shows a broken state or white screen.
-          console.error(`⚠️ API Bridge Error for ${platform}. Falling back to mock data.`, err);
-          setError(err.message || 'Failed to fetch live data');
-          setData(mockFallbackData);
+          if (err instanceof Error && err.message === "SILENT_EXECUTIVE_BYPASS") {
+            // Executive bypass, no real data aggregated yet so just set null
+            setData(null);
+          } else {
+            // Silence expected unconfigured datasource errors to prevent console spam
+            const isIgnoredError = err?.message?.includes("unknown platform") || err?.message?.includes("Forbidden") || err?.message?.includes("HTTP error");
+            if (!isIgnoredError) {
+              console.error(`⚠️ API Bridge Error for ${platform}.`, err);
+            }
+            setData(null);
+          }
+          setError(err.message === "SILENT_EXECUTIVE_BYPASS" ? null : (err.message || 'Failed to fetch live data'));
           setIsLive(false);
         }
       } finally {

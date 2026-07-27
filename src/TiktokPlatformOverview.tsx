@@ -27,6 +27,7 @@ import {
   Cell
 } from 'recharts';
 import { useDashboardData } from './hooks/useDashboardData';
+import { EmptyStateDisplay } from './components/dashboard/EmptyStateDisplay';
 
 export interface TiktokKpiMetric {
   title: string;
@@ -204,12 +205,12 @@ export default function TiktokPlatformOverview() {
               <div className="bg-[#EAE3D9] h-[300px] rounded-xl"></div>
             </div>
           </div>
-        ) : (
+        ) : !data ? (<EmptyStateDisplay platformName="TikTok Ads" />) : (
           <>
             {error && (
               <div className="bg-[#FFF9E6] text-[#B8860B] border border-[#F5E1C8] px-4 py-3 rounded-xl mb-6 flex items-center shadow-sm">
                 <AlertTriangle size={18} className="mr-2" />
-                <span className="text-sm font-medium">Live data sync failed. Displaying cached data.</span>
+                <span className="text-sm font-medium">Live data sync failed.</span>
               </div>
             )}
 

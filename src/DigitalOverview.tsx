@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Building2, Calendar, ChevronDown, AlertTriangle, Zap, Activity, Info, Sparkles, TrendingUp, TrendingDown, RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useDashboardData } from './hooks/useDashboardData';
+import { EmptyStateDisplay } from './components/dashboard/EmptyStateDisplay';
 import { DateRange } from './components/dashboard/GlobalDateRangePicker';
 import { BusinessProfile } from './types/business';
 import { getKpiMapping } from './utils/kpiMapping';
@@ -185,12 +186,12 @@ export default function DigitalOverview({
             <div className="bg-[#EAE3D9] h-[450px] rounded-2xl"></div>
             <div className="bg-[#EAE3D9] h-[350px] rounded-2xl"></div>
           </div>
-        ) : (
+        ) : !data ? (<EmptyStateDisplay platformName="Executive Overview" />) : (
           <>
             {error && (
               <div className="bg-[#FFF9E6] text-[#B8860B] border border-[#F5E1C8] px-4 py-3 rounded-xl mb-6 flex items-center shadow-sm">
                 <AlertTriangle size={18} className="mr-2" />
-                <span className="text-sm font-medium">Live data sync failed. Using profile-specific defaults.</span>
+                <span className="text-sm font-medium">Live data sync failed.</span>
               </div>
             )}
 

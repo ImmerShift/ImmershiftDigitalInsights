@@ -28,6 +28,7 @@ import {
   Legend
 } from 'recharts';
 import { useDashboardData } from './hooks/useDashboardData';
+import { EmptyStateDisplay } from './components/dashboard/EmptyStateDisplay';
 
 export interface YoutubeKpiMetric {
   title: string;
@@ -253,12 +254,12 @@ export default function YoutubePlatformOverview() {
             </div>
             <div className="bg-[#EAE3D9] h-64 rounded-xl"></div>
           </div>
-        ) : (
+        ) : !data ? (<EmptyStateDisplay platformName="Youtube" />) : (
           <>
             {/* Error State Failsafe */}
             {error && (
               <div className="bg-[#FFF9E6] text-[#B8860B] border border-[#F5E1C8] rounded-xl p-3 mb-6 text-sm font-medium flex justify-between items-center shadow-sm">
-                <span>⚠️ Live data sync failed. Displaying cached data.</span>
+                <span>⚠️ Live data sync failed.</span>
               </div>
             )}
 

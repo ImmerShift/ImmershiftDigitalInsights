@@ -99,6 +99,50 @@ async function startServer() {
     `);
   });
 
+  // Data Proxy for GAS Web App to avoid CORS issues
+  app.get("/api/proxy/:safePlatform", async (req, res) => {
+    const { safePlatform } = req.params;
+    const { startDate, endDate, auth_token } = req.query;
+    
+    const reversePlatformMap: Record<string, string> = {
+      p1: 'ga4',
+      p2: 'gsc',
+      p3: 'youtube',
+      p4: 'meta',
+      p5: 'tiktok',
+      p6: 'email'
+    };
+    const platform = reversePlatformMap[safePlatform] || safePlatform;
+    
+    // Original GAS Web App URL
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzz2UV_EPrpFUKlxIyQ71KaVlKihSxXrgAOPbnGPLhn__0LPDier3lEH4z0KoAtiqLnog/exec';
+    
+    try {
+      let url = `${GAS_WEB_APP_URL}?platform=${platform}`;
+      if (startDate && endDate) {
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+      }
+      if (auth_token) {
+        url += `&auth_token=${encodeURIComponent(auth_token as string)}`;
+      }
+
+      const response = await fetch(url, {
+        method: 'GET',
+        redirect: 'follow'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error from GAS: ${response.status}`);
+      }
+
+      const data = await response.json();
+      res.json(data);
+    } catch (error: any) {
+      console.error(`Proxy Error for platform ${platform}:`, error.message);
+      res.status(500).json({ error: "Failed to fetch data from original source" });
+    }
+  });
+
   // Auth: Token Exchange & Account Fetching
   app.post("/api/auth/:platform/exchange-and-accounts", async (req, res) => {
     const { platform } = req.params;
