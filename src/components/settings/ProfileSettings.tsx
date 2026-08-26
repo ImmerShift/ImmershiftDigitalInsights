@@ -57,7 +57,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
       className={`flex items-center gap-2 px-6 py-3 text-sm font-bold border-b-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7A2B20] focus-visible:ring-offset-2 ${
         activeTab === id 
           ? 'border-[#7A2B20] text-[#7A2B20]' 
-          : 'border-transparent text-[#A88C87] hover:text-[#5C4541]'
+          : 'border-transparent text-[#856B66] hover:text-[#5C4541]'
       }`}
     >
       <Icon size={16} />
@@ -104,8 +104,8 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
                 </button>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-[#3E1510]">{user?.displayName || 'John Doe'}</h3>
-                <p className="text-sm text-[#A88C87] mt-1 italic">Product Design Manager at Syah Bali Ventura</p>
+                <h3 className="text-lg font-bold text-[#3E1510]">{user?.displayName || user?.email || 'Your account'}</h3>
+                <p className="text-sm text-[#856B66] mt-1">{user?.email}</p>
                 <div className="flex items-center gap-2 mt-3">
                    <div className="px-2 py-0.5 bg-[#FDF8F3] border border-[#F5E1C8] rounded-md text-[9px] font-black uppercase text-[#DDA77B]">Admin Account</div>
                 </div>
@@ -114,7 +114,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Display Name</label>
+                <label className="text-[10px] font-black uppercase text-[#856B66] tracking-widest pl-1">Display Name</label>
                 <input 
                   type="text" 
                   defaultValue={user?.displayName || 'John Doe'}
@@ -122,12 +122,12 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Email Address</label>
+                <label className="text-[10px] font-black uppercase text-[#856B66] tracking-widest pl-1">Email Address</label>
                 <input 
                   type="email" 
                   disabled
                   defaultValue={user?.email || 'john@immershift.com'}
-                  className="w-full px-5 py-3 bg-[#F9F7F4] border-none rounded-2xl text-[#A88C87] font-medium cursor-not-allowed"
+                  className="w-full px-5 py-3 bg-[#F9F7F4] border-none rounded-2xl text-[#856B66] font-medium cursor-not-allowed"
                 />
               </div>
             </div>
@@ -170,7 +170,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
                       </span>
                       <input type="file" className="hidden" onChange={handleLogoUpload} accept="image/*" />
                     </label>
-                    <p className="text-[10px] text-[#A88C87] mt-4 font-bold uppercase tracking-widest">SVG, PNG or JPG (Max 500KB)</p>
+                    <p className="text-[10px] text-[#856B66] mt-4 font-bold uppercase tracking-widest">SVG, PNG or JPG (Max 500KB)</p>
                   </div>
                </div>
             </div>
@@ -185,7 +185,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
                    <div key={i} className="p-4 rounded-2xl border border-[#F9F7F4] flex justify-between items-center group">
                       <div>
                         <p id={`toggle-label-${item.id}`} className="text-xs font-bold text-[#3E1510]">{item.label}</p>
-                        <p className="text-[10px] text-[#A88C87] mt-1">{item.desc}</p>
+                        <p className="text-[10px] text-[#856B66] mt-1">{item.desc}</p>
                       </div>
                       <button 
                          role="switch" 
@@ -205,7 +205,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
 
         {activeTab === 'security' && (
           <div role="tabpanel" id="panel-security" aria-labelledby="tab-security" className="py-20 flex flex-col items-center justify-center text-center">
-            <Shield size={64} className="text-[#A88C87] mb-6 opacity-20" />
+            <Shield size={64} className="text-[#856B66] mb-6 opacity-20" />
             <h3 className="text-xl font-bold text-[#3E1510]">Enhanced Security Layer</h3>
             <p className="text-[#5C4541] mt-2 max-w-sm">
               Your account is currently protected by Firebase Identity Management. MFA and advanced logging are enabled by default.
@@ -215,7 +215,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
 
         {activeTab === 'billing' && (
           <div role="tabpanel" id="panel-billing" aria-labelledby="tab-billing" className="py-20 flex flex-col items-center justify-center text-center">
-            <CreditCard size={64} className="text-[#A88C87] mb-6 opacity-20" />
+            <CreditCard size={64} className="text-[#856B66] mb-6 opacity-20" />
             <h3 className="text-xl font-bold text-[#3E1510]">Agency Pro Plan</h3>
             <p className="text-[#5C4541] mt-2 max-w-sm">
               You are on the highest tier, allowing unlimited connectors and unlimited AI analyst tokens.
@@ -225,7 +225,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ user, onUpdate
       </div>
 
       <div className="mt-8 flex justify-end gap-3 font-bold text-sm">
-         <button className="px-8 py-3 text-[#A88C87] hover:text-[#5C4541]">Cancel</button>
+         <button className="px-8 py-3 text-[#856B66] hover:text-[#5C4541]">Cancel</button>
          <button 
           onClick={() => {
             setSavedMessage(true);
