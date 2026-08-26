@@ -28,6 +28,7 @@ import {
   Cell
 } from 'recharts';
 import { useDashboardData } from './hooks/useDashboardData';
+import type { DateRange } from './components/dashboard/GlobalDateRangePicker';
 import { EmptyStateDisplay } from './components/dashboard/EmptyStateDisplay';
 
 export interface EmailKpiMetric {
@@ -141,8 +142,8 @@ const getIcon = (iconName: string) => {
   }
 };
 
-export default function EmailPlatformOverview() {
-  const { data, isLoading, error } = useDashboardData<EmailDashboardPayload>('email', MOCK_FALLBACK_DATA_EMAIL);
+export default function EmailPlatformOverview({ dateRange }: { dateRange?: DateRange }) {
+  const { data, isLoading, error } = useDashboardData<EmailDashboardPayload>('email', MOCK_FALLBACK_DATA_EMAIL, dateRange);
 
   const kpis = Array.isArray(data?.kpis) ? data.kpis : [];
   const timeSeries = Array.isArray(data?.timeSeries) ? data.timeSeries : [];

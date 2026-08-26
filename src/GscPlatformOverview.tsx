@@ -27,6 +27,7 @@ import {
   Cell
 } from 'recharts';
 import { useDashboardData } from './hooks/useDashboardData';
+import type { DateRange } from './components/dashboard/GlobalDateRangePicker';
 import { EmptyStateDisplay } from './components/dashboard/EmptyStateDisplay';
 
 export interface GscKpiMetric {
@@ -163,8 +164,8 @@ const getIcon = (iconName: string) => {
   }
 };
 
-export default function GscPlatformOverview() {
-  const { data, isLoading, error } = useDashboardData<GscDashboardPayload>('gsc', MOCK_FALLBACK_DATA_GSC);
+export default function GscPlatformOverview({ dateRange }: { dateRange?: DateRange }) {
+  const { data, isLoading, error } = useDashboardData<GscDashboardPayload>('gsc', MOCK_FALLBACK_DATA_GSC, dateRange);
 
   const kpis = Array.isArray(data?.kpis) ? data.kpis : [];
   const timeSeries = Array.isArray(data?.timeSeries) ? data.timeSeries : [];

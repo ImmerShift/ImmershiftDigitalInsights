@@ -28,6 +28,7 @@ import {
   Legend
 } from 'recharts';
 import { useDashboardData } from './hooks/useDashboardData';
+import type { DateRange } from './components/dashboard/GlobalDateRangePicker';
 import { EmptyStateDisplay } from './components/dashboard/EmptyStateDisplay';
 
 export interface YoutubeKpiMetric {
@@ -196,8 +197,8 @@ const getIcon = (iconName: string) => {
   }
 };
 
-export default function YoutubePlatformOverview() {
-  const { data, isLoading, error } = useDashboardData<YoutubeDashboardPayload>('youtube', MOCK_FALLBACK_DATA_YOUTUBE);
+export default function YoutubePlatformOverview({ dateRange }: { dateRange?: DateRange }) {
+  const { data, isLoading, error } = useDashboardData<YoutubeDashboardPayload>('youtube', MOCK_FALLBACK_DATA_YOUTUBE, dateRange);
 
   const kpis = Array.isArray(data?.kpis) ? data.kpis : [];
   const timeSeries = Array.isArray(data?.timeSeries) ? data.timeSeries : [];

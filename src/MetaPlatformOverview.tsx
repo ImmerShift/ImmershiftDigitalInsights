@@ -27,6 +27,7 @@ import {
   Cell
 } from 'recharts';
 import { useDashboardData } from './hooks/useDashboardData';
+import type { DateRange } from './components/dashboard/GlobalDateRangePicker';
 import { EmptyStateDisplay } from './components/dashboard/EmptyStateDisplay';
 
 export interface MetaKpiMetric {
@@ -139,8 +140,8 @@ const getIcon = (iconName: string) => {
   }
 };
 
-export default function MetaPlatformOverview({ onDataLoaded }: { onDataLoaded?: (data: any) => void }) {
-  const { data, isLoading, error } = useDashboardData<MetaDashboardPayload>('meta', MOCK_FALLBACK_DATA_META);
+export default function MetaPlatformOverview({ onDataLoaded, dateRange }: { onDataLoaded?: (data: any) => void; dateRange?: DateRange }) {
+  const { data, isLoading, error } = useDashboardData<MetaDashboardPayload>('meta', MOCK_FALLBACK_DATA_META, dateRange);
 
   React.useEffect(() => {
     if (data && onDataLoaded) {

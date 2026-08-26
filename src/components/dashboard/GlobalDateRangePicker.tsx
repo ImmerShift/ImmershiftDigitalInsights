@@ -13,12 +13,31 @@ interface GlobalDateRangePickerProps {
   onChange: (range: DateRange) => void;
 }
 
-const PRESETS: DateRange[] = [
-  { label: 'Last 7 Days', startDate: '2026-04-18', endDate: '2026-04-25' },
-  { label: 'Last 14 Days', startDate: '2026-04-11', endDate: '2026-04-25' },
-  { label: 'Last 30 Days', startDate: '2026-03-26', endDate: '2026-04-25' },
-  { label: 'Month to Date', startDate: '2026-04-01', endDate: '2026-04-25' },
-];
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+const daysAgo = (n: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return iso(d);
+};
+
+/**
+ * Presets are computed at call time, not module load, so a long-lived tab
+ * doesn't keep serving yesterday's window. "Last 7 Days" must always mean
+ * the last 7 days.
+ */
+export const getPresets = (): DateRange[] => {
+  const today = iso(new Date());
+  const monthStart = iso(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  return [
+    { label: 'Last 7 Days', startDate: daysAgo(7), endDate: today },
+    { label: 'Last 14 Days', startDate: daysAgo(14), endDate: today },
+    { label: 'Last 30 Days', startDate: daysAgo(30), endDate: today },
+    { label: 'Month to Date', startDate: monthStart, endDate: today },
+  ];
+};
+
+export const getDefaultRange = (): DateRange => getPresets()[1];
 
 export const GlobalDateRangePicker: React.FC<GlobalDateRangePickerProps> = ({ range, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -62,7 +81,7 @@ export const GlobalDateRangePicker: React.FC<GlobalDateRangePickerProps> = ({ ra
               {!showCustom ? (
                 <>
                   <div className="p-2">
-                    {PRESETS.map((preset) => (
+                    {getPresets().map((preset) => (
                       <button
                         key={preset.label}
                         onClick={() => {

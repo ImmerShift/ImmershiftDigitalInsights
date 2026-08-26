@@ -22,7 +22,7 @@ import { CommandCenter } from './components/dashboard/CommandCenter';
 import { AiAnalystSidebar } from './components/dashboard/AiAnalystSidebar';
 import { Sidebar, ViewType } from './components/layout/Sidebar';
 import { ProfileSettings } from './components/settings/ProfileSettings';
-import { GlobalDateRangePicker, DateRange } from './components/dashboard/GlobalDateRangePicker';
+import { GlobalDateRangePicker, DateRange, getDefaultRange } from './components/dashboard/GlobalDateRangePicker';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
 import { MessageSquare, Sparkles } from 'lucide-react';
@@ -37,11 +37,7 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [authView, setAuthView] = useState<'login' | 'register'>('login');
   const [logoUrl, setLogoUrl] = useState<string>('');
-  const [dateRange, setDateRange] = useState<DateRange>({ 
-    label: 'Last 14 Days', 
-    startDate: '2026-04-11', 
-    endDate: '2026-04-25' 
-  });
+  const [dateRange, setDateRange] = useState<DateRange>(getDefaultRange);
 
   // Auth Listener
   useEffect(() => {
@@ -234,12 +230,12 @@ export default function App() {
             </div>
           )}
           {currentView === 'draft' && <DraftReportView />}
-          {currentView === 'email' && <EmailPlatformOverview />}
-          {currentView === 'tiktok' && <TiktokPlatformOverview />}
-          {currentView === 'ga4' && <Ga4PlatformOverview />}
-          {currentView === 'meta' && <MetaPlatformOverview onDataLoaded={handleContextUpdate} />}
-          {currentView === 'gsc' && <GscPlatformOverview />}
-          {currentView === 'youtube' && <YoutubePlatformOverview />}
+          {currentView === 'email' && <EmailPlatformOverview dateRange={dateRange} />}
+          {currentView === 'tiktok' && <TiktokPlatformOverview dateRange={dateRange} />}
+          {currentView === 'ga4' && <Ga4PlatformOverview dateRange={dateRange} />}
+          {currentView === 'meta' && <MetaPlatformOverview onDataLoaded={handleContextUpdate} dateRange={dateRange} />}
+          {currentView === 'gsc' && <GscPlatformOverview dateRange={dateRange} />}
+          {currentView === 'youtube' && <YoutubePlatformOverview dateRange={dateRange} />}
           {currentView === 'connectors' && <ConnectorsSetup />}
           {currentView === 'profile' && <ProfileSettings user={user} logoUrl={logoUrl} onUpdateLogo={handleUpdateLogo} />}
           {currentView === 'users' && (

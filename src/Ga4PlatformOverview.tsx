@@ -26,6 +26,7 @@ import {
   Cell
 } from 'recharts';
 import { useDashboardData } from './hooks/useDashboardData';
+import type { DateRange } from './components/dashboard/GlobalDateRangePicker';
 import { EmptyStateDisplay } from './components/dashboard/EmptyStateDisplay';
 
 export interface KpiMetric {
@@ -132,8 +133,8 @@ const getIcon = (iconName: string) => {
   }
 };
 
-export default function Ga4PlatformOverview() {
-  const { data, isLoading, error } = useDashboardData<Ga4DashboardPayload>('ga4', MOCK_FALLBACK_DATA);
+export default function Ga4PlatformOverview({ dateRange }: { dateRange?: DateRange }) {
+  const { data, isLoading, error } = useDashboardData<Ga4DashboardPayload>('ga4', MOCK_FALLBACK_DATA, dateRange);
 
   const kpis = Array.isArray(data?.kpis) ? data.kpis : [];
   const timeSeries = Array.isArray(data?.timeSeries) ? data.timeSeries : [];
