@@ -5,3 +5,16 @@
   --color-brand-primary: var(--primary-brand, #7A2B20);
   --color-brand-secondary: var(--secondary-brand, #DDA77B);
 }
+
+/* The app uses framer-motion plus ~38 `transition-all` utilities and a
+   spinning loader. None of it honoured a reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

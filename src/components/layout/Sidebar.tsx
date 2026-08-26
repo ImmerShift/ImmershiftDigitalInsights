@@ -47,7 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, use
         }`}
       >
         <div className="flex items-center gap-3">
-          <Icon size={18} className={isActive ? 'text-white' : 'text-[#A88C87] group-hover:text-[#7A2B20]'} />
+          <Icon size={18} className={isActive ? 'text-white' : 'text-[#856B66] group-hover:text-[#7A2B20]'} />
           <span className={`text-sm font-semibold ${isActive ? 'translate-x-1' : ''} transition-transform`}>
             {label}
           </span>
@@ -58,7 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, use
   };
 
   const CategoryLabel = ({ label }: { label: string }) => (
-    <p className="px-4 text-[10px] font-black uppercase text-[#A88C87] tracking-[0.2em] mb-2 mt-6">
+    <p className="px-4 text-[10px] font-black uppercase text-[#856B66] tracking-[0.2em] mb-2 mt-6">
       {label}
     </p>
   );
@@ -88,8 +88,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, use
           )}
         </div>
         <div>
-           <h1 className="font-serif font-black text-xl text-[#3E1510] leading-none">ImmerShift</h1>
-           <p className="text-[10px] font-bold text-[#A88C87] uppercase tracking-widest mt-1">Growth Engine</p>
+           {/* Not an <h1>: the page's own title is the h1. Two h1s per page
+               made the logo outrank the actual page heading for screen readers. */}
+           <span className="block font-serif font-black text-xl text-[#3E1510] leading-none">ImmerShift</span>
+           <p className="text-[10px] font-bold text-[#856B66] uppercase tracking-widest mt-1">Growth Engine</p>
         </div>
       </div>
 
@@ -136,11 +138,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, use
             </div>
             <div className="flex-1 min-w-0">
                <p className="text-sm font-bold text-[#3E1510] truncate">{user.displayName || 'Guest User'}</p>
-               <p className="text-[10px] text-[#A88C87] font-medium truncate">{user.email}</p>
+               <p className="text-[10px] text-[#856B66] font-medium truncate">{user.email}</p>
             </div>
             <button 
               onClick={() => setShowLogoutModal(true)}
-              className="p-2 text-[#A88C87] hover:text-[#7A2B20] transition-colors"
+              className="p-2 text-[#856B66] hover:text-[#7A2B20] transition-colors"
               aria-label="Logout"
             >
               <LogOut size={16} />
