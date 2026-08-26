@@ -63,9 +63,11 @@ export const GlobalDateRangePicker: React.FC<GlobalDateRangePickerProps> = ({ ra
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#EAE3D9] rounded-xl text-sm font-bold text-[#3E1510] hover:bg-[#FDF8F3] transition-all shadow-sm active:scale-95"
       >
-        <Calendar size={16} className="text-brand-primary" />
-        <span className="min-w-[140px] text-left">{range.label}</span>
-        <ChevronDown size={14} className={`text-[#A88C87] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <Calendar size={16} className="text-brand-primary shrink-0" />
+        {/* min-w-[140px] forced the control 16px past a 375px viewport.
+            The floor only applies once there's room for it. */}
+        <span className="sm:min-w-[140px] text-left truncate">{range.label}</span>
+        <ChevronDown size={14} className={`text-[#856B66] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       <AnimatePresence>
@@ -100,7 +102,7 @@ export const GlobalDateRangePicker: React.FC<GlobalDateRangePickerProps> = ({ ra
                     ))}
                   </div>
                   <div className="p-3 bg-[#F9F7F4] border-t border-[#EAE3D9] flex justify-between items-center">
-                    <span className="text-[10px] text-[#A88C87] uppercase font-black tracking-widest">Custom Range</span>
+                    <span className="text-[10px] text-[#856B66] uppercase font-black tracking-widest">Custom Range</span>
                     <button 
                       onClick={() => setShowCustom(true)}
                       className="text-[10px] text-brand-primary font-bold hover:underline"
@@ -113,7 +115,7 @@ export const GlobalDateRangePicker: React.FC<GlobalDateRangePickerProps> = ({ ra
                 <div className="p-4 space-y-4">
                   <div className="space-y-3">
                     <div className="space-y-1">
-                      <label className="text-[9px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Start Date</label>
+                      <label className="text-[9px] font-black uppercase text-[#856B66] tracking-widest pl-1">Start Date</label>
                       <input 
                         type="date" 
                         value={customStart}
@@ -122,7 +124,7 @@ export const GlobalDateRangePicker: React.FC<GlobalDateRangePickerProps> = ({ ra
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[9px] font-black uppercase text-[#A88C87] tracking-widest pl-1">End Date</label>
+                      <label className="text-[9px] font-black uppercase text-[#856B66] tracking-widest pl-1">End Date</label>
                       <input 
                         type="date" 
                         value={customEnd}
@@ -134,7 +136,7 @@ export const GlobalDateRangePicker: React.FC<GlobalDateRangePickerProps> = ({ ra
                   <div className="flex gap-2 pt-2">
                     <button 
                       onClick={() => setShowCustom(false)}
-                      className="flex-1 py-2 text-xs font-bold text-[#A88C87] hover:bg-[#F9F7F4] rounded-xl transition-colors"
+                      className="flex-1 py-2 text-xs font-bold text-[#856B66] hover:bg-[#F9F7F4] rounded-xl transition-colors"
                     >
                       Back
                     </button>
