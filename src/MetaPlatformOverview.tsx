@@ -85,13 +85,13 @@ const MOCK_FALLBACK_DATA_META: MetaDashboardPayload = {
   ],
   funnel: [
     { stage: 'Link Clicks', users: 37849, fill: '#DDA77B' },
-    { stage: 'Landing Page Views', users: 15200, fill: '#A88C87' },
+    { stage: 'Landing Page Views', users: 15200, fill: '#856B66' },
     { stage: 'Initiate Checkout', users: 21, fill: '#A43927' }
   ],
   objectives: [
     { name: 'Traffic', value: 58, fill: '#DDA77B' },
     { name: 'Conversions', value: 22, fill: '#7A2B20' },
-    { name: 'Engagement', value: 20, fill: '#A88C87' }
+    { name: 'Engagement', value: 20, fill: '#856B66' }
   ],
   campaigns: [
     {
@@ -235,7 +235,7 @@ export default function MetaPlatformOverview({ onDataLoaded, dateRange }: { onDa
                 return (
                   <div key={index} className="bg-white rounded-xl border border-[#EAE3D9] p-5 shadow-sm flex flex-col justify-between h-full">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="text-[#A88C87]">
+                      <div className="text-[#856B66]">
                         <Icon size={20} />
                       </div>
                       <h3 className="text-sm font-bold text-[#5C4541] uppercase tracking-wide">{kpi.title}</h3>
@@ -267,27 +267,27 @@ export default function MetaPlatformOverview({ onDataLoaded, dateRange }: { onDa
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAE3D9" />
                     <XAxis 
                       dataKey="date" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false} 
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                       dy={10}
                     />
                     <YAxis 
                       yAxisId="left" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                       tickFormatter={(val) => `${val}M`}
                     />
                     <YAxis 
                       yAxisId="right" 
                       orientation="right" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Area 
@@ -379,7 +379,7 @@ export default function MetaPlatformOverview({ onDataLoaded, dateRange }: { onDa
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                       <span className="text-2xl font-bold font-serif text-[#3E1510]">100%</span>
-                      <span className="text-xs font-semibold text-[#A88C87] uppercase tracking-widest mt-1">Spend</span>
+                      <span className="text-xs font-semibold text-[#856B66] uppercase tracking-widest mt-1">Spend</span>
                     </div>
                   </div>
                   
@@ -407,12 +407,12 @@ export default function MetaPlatformOverview({ onDataLoaded, dateRange }: { onDa
                 <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead>
                     <tr>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Campaign Name</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Objective</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Spend</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Link Clicks</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">CPC</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Checkouts</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider">Campaign Name</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider">Objective</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Spend</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Link Clicks</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">CPC</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Checkouts</th>
                     </tr>
                   </thead>
                   <tbody>

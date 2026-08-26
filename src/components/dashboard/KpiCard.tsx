@@ -49,7 +49,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({ title, value, subtitle, trend,
         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${badgeClasses}`}>
           {percentage}
         </span>
-        <span className="text-xs font-medium text-[#A88C87] truncate">
+        <span className="text-xs font-medium text-[#856B66] truncate">
           {subtitle}
         </span>
       </div>

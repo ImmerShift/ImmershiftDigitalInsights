@@ -172,7 +172,7 @@ export default function DigitalOverview({
               {anomaly.type === 'warn' ? <TrendingDown size={20} /> : <TrendingUp size={20} />}
             </div>
             <div>
-               <p className="text-xs font-black uppercase tracking-widest text-[#A88C87] mb-1">Real-time Performance Pulse</p>
+               <p className="text-xs font-black uppercase tracking-widest text-[#856B66] mb-1">Real-time Performance Pulse</p>
                <p className="text-sm font-bold text-[#3E1510]">{anomaly.msg}</p>
             </div>
           </motion.div>
@@ -224,16 +224,16 @@ export default function DigitalOverview({
                 <div>
                   <div className="flex items-center gap-2 mb-6">
                     <Activity size={18} className="text-brand-primary" />
-                    <h3 className="text-xs font-black uppercase tracking-[.2em] text-[#A88C87]">Predictive Pacing</h3>
+                    <h3 className="text-xs font-black uppercase tracking-[.2em] text-[#856B66]">Predictive Pacing</h3>
                   </div>
                   
                   <div className="space-y-6">
                     <div>
-                      <p className="text-[10px] font-bold text-[#A88C87] uppercase mb-1">Projected {kpiLabels[0].label}</p>
+                      <p className="text-[10px] font-bold text-[#856B66] uppercase mb-1">Projected {kpiLabels[0].label}</p>
                       <p className="text-4xl font-serif font-black text-brand-primary">{forecast?.projectedRevenue || 'IDR 285.4M'}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold text-[#A88C87] uppercase mb-1">Projected Spend</p>
+                      <p className="text-[10px] font-bold text-[#856B66] uppercase mb-1">Projected Spend</p>
                       <p className="text-2xl font-bold text-[#3E1510]">{forecast?.projectedSpend || 'IDR 52.8M'}</p>
                     </div>
                   </div>
@@ -250,7 +250,7 @@ export default function DigitalOverview({
                       style={{ width: `${(forecast?.confidenceScore || 0.88) * 100}%` }}
                     ></div>
                   </div>
-                  <p className="text-[10px] mt-4 text-[#A88C87] font-medium leading-relaxed italic border-l-2 border-brand-secondary pl-3">
+                  <p className="text-[10px] mt-4 text-[#856B66] font-medium leading-relaxed italic border-l-2 border-brand-secondary pl-3">
                     {forecast?.insight || "Revenue is pacing ahead of schedule due to strong performance in conversion-layer channels."}
                   </p>
                 </div>
@@ -288,7 +288,7 @@ export default function DigitalOverview({
                   </div>
                   <div>
                     <h2 className="text-2xl font-serif font-bold text-[#3E1510]">Creative Intelligence</h2>
-                    <p className="text-sm text-[#A88C87] font-medium uppercase tracking-widest">Visual Analysis & Asset Performance</p>
+                    <p className="text-sm text-[#856B66] font-medium uppercase tracking-widest">Visual Analysis & Asset Performance</p>
                   </div>
                </div>
                <CreativePerformanceGrid business={CURRENT_BUSINESS} />

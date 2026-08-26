@@ -94,7 +94,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate, onAiAs
             aria-label="Command Center"
           >
             <div className="flex items-center px-6 border-b border-[#F9F7F4]">
-              <Search className="text-[#A88C87]" size={20} />
+              <Search className="text-[#856B66]" size={20} />
               <input 
                 autoFocus
                 value={query}
@@ -107,7 +107,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate, onAiAs
                 aria-controls="command-options"
                 aria-activedescendant={filteredActions.length > 0 ? `action-${filteredActions[selectedIndex]?.id}` : undefined}
               />
-              <div className="flex items-center gap-1 px-2 py-1 bg-[#F9F7F4] rounded-lg text-[#A88C87] text-[10px] font-black uppercase">
+              <div className="flex items-center gap-1 px-2 py-1 bg-[#F9F7F4] rounded-lg text-[#856B66] text-[10px] font-black uppercase">
                  <CommandIcon size={10} /> K
               </div>
             </div>
@@ -132,7 +132,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate, onAiAs
                          </div>
                          <span className="text-sm font-bold">{action.label}</span>
                       </div>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-[#A88C87]">{action.category}</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-[#856B66]">{action.category}</span>
                     </button>
                   ))}
                 </div>
@@ -142,7 +142,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate, onAiAs
                       <Sparkles size={20} className="text-brand-primary" />
                    </div>
                    <p className="text-sm font-bold text-[#3E1510]">Ask AI Analyst: "{query}"</p>
-                   <p className="text-xs text-[#A88C87] mt-1">Press Enter to initiate a cross-channel data synthesized answer.</p>
+                   <p className="text-xs text-[#856B66] mt-1">Press Enter to initiate a cross-channel data synthesized answer.</p>
                    <button 
                     onClick={() => { onAiAsk(query); setIsOpen(false); }}
                     className="mt-6 px-4 py-2 bg-brand-primary text-white text-xs font-black uppercase rounded-xl hover:bg-[#5C2118] transition-colors"
@@ -153,7 +153,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onNavigate, onAiAs
               )}
             </div>
 
-            <div className="p-4 bg-[#F9F7F4] border-t border-[#EAE3D9] flex justify-between items-center text-[10px] text-[#A88C87] font-bold">
+            <div className="p-4 bg-[#F9F7F4] border-t border-[#EAE3D9] flex justify-between items-center text-[10px] text-[#856B66] font-bold">
                <div className="flex gap-4">
                  <span className="flex items-center gap-1 tracking-widest"><ShieldCheck size={10} /> SOC-2 Compliant</span>
                  <span className="flex items-center gap-1 tracking-widest"><Terminal size={10} /> API v4.2 Agent</span>

@@ -121,7 +121,7 @@ const MOCK_FALLBACK_DATA_GSC: GscDashboardPayload = {
     { positionGroup: 'Top 3', keywords: 45, fill: '#2E6B3B' },
     { positionGroup: 'Pos 4 to 10', keywords: 120, fill: '#7A2B20' },
     { positionGroup: 'Pos 11 to 20', keywords: 340, fill: '#DDA77B' },
-    { positionGroup: 'Pos 21+', keywords: 850, fill: '#A88C87' }
+    { positionGroup: 'Pos 21+', keywords: 850, fill: '#856B66' }
   ],
   brandData: [
     { name: 'Brand', value: 65, fill: '#7A2B20' },
@@ -245,7 +245,7 @@ export default function GscPlatformOverview({ dateRange }: { dateRange?: DateRan
                 return (
                   <div key={kpi.id} className="bg-white rounded-xl border border-[#EAE3D9] p-5 shadow-sm flex flex-col justify-between h-full">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="text-[#A88C87]">
+                      <div className="text-[#856B66]">
                         <Icon size={20} />
                       </div>
                       <h3 className="text-sm font-bold text-[#5C4541] uppercase tracking-wide">{kpi.title}</h3>
@@ -278,26 +278,26 @@ export default function GscPlatformOverview({ dateRange }: { dateRange?: DateRan
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAE3D9" />
                     <XAxis 
                       dataKey="date" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false} 
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                       dy={10}
                     />
                     <YAxis 
                       yAxisId="left" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                     />
                     <YAxis 
                       yAxisId="right" 
                       orientation="right" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Area 
@@ -387,7 +387,7 @@ export default function GscPlatformOverview({ dateRange }: { dateRange?: DateRan
                     {/* Center text for Donut */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                       <span className="text-2xl font-bold font-serif text-[#3E1510]">1,762</span>
-                      <span className="text-xs font-semibold text-[#A88C87] uppercase tracking-widest mt-1">Total Clicks</span>
+                      <span className="text-xs font-semibold text-[#856B66] uppercase tracking-widest mt-1">Total Clicks</span>
                     </div>
                   </div>
                   
@@ -415,11 +415,11 @@ export default function GscPlatformOverview({ dateRange }: { dateRange?: DateRan
                 <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
                     <tr>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Search Query</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Clicks</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Impressions</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">CTR</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Avg Position</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider">Search Query</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Clicks</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Impressions</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">CTR</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Avg Position</th>
                     </tr>
                   </thead>
                   <tbody>

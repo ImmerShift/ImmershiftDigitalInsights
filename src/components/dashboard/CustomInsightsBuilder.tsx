@@ -98,7 +98,7 @@ export const CustomInsightsBuilder: React.FC<CustomInsightsBuilderProps> = ({ av
              <div className="p-1.5 bg-[#FDF8F3] border border-[#F5E1C8] rounded-lg">
                 <Layout size={16} className="text-[#DDA77B]" />
              </div>
-             <p className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest">Workspace</p>
+             <p className="text-[10px] font-black uppercase text-[#856B66] tracking-widest">Workspace</p>
            </div>
            <h1 className="text-3xl font-serif font-black text-[#3E1510]">Insight Scratchpad</h1>
            <p className="text-[#5C4541] mt-2 max-w-xl">
@@ -128,12 +128,12 @@ export const CustomInsightsBuilder: React.FC<CustomInsightsBuilderProps> = ({ av
             value={request}
             onChange={(e) => setRequest(e.target.value)}
             placeholder={language === 'en' ? "e.g., 'Compare conversion rates of TikTok vs Meta Ads for the last 14 days'" : "misal: 'Bandingkan conversion rate TikTok vs Meta Ads selama 14 hari terakhir'"}
-            className="w-full h-32 p-6 bg-[#F9F7F4] rounded-2xl border-none focus:ring-2 focus:ring-brand-primary text-[#3E1510] font-medium placeholder-[#A88C87] resize-none"
+            className="w-full h-32 p-6 bg-[#F9F7F4] rounded-2xl border-none focus:ring-2 focus:ring-brand-primary text-[#3E1510] font-medium placeholder-[#856B66] resize-none"
           />
           <div className="absolute bottom-4 right-4 flex items-center gap-2">
             <button 
               onClick={toggleListening}
-              className={`p-3 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-white text-[#A88C87] border border-[#EAE3D9] hover:text-brand-primary'}`}
+              className={`p-3 rounded-xl transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-white text-[#856B66] border border-[#EAE3D9] hover:text-brand-primary'}`}
             >
               {isListening ? <MicOff size={20} /> : <Mic size={20} />}
             </button>
@@ -192,7 +192,7 @@ export const CustomInsightsBuilder: React.FC<CustomInsightsBuilderProps> = ({ av
                 <Plus size={32} className="text-[#DDA77B]" />
              </div>
              <p className="text-[#3E1510] font-black uppercase text-xs tracking-widest">Your Private Insight Workspace</p>
-             <p className="text-[#A88C87] text-sm mt-2 text-center max-w-sm">
+             <p className="text-[#856B66] text-sm mt-2 text-center max-w-sm">
                Synthesized widgets will appear here. Pin them to your dashboard or export as a report section.
              </p>
           </div>

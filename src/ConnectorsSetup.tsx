@@ -369,7 +369,7 @@ export default function ConnectorsSetup() {
                   <div className="h-3 w-px bg-[#EAE3D9]" />
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#A88C87]">All Systems Operational</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#856B66]">All Systems Operational</span>
                   </div>
                 </div>
               </div>
@@ -408,7 +408,7 @@ export default function ConnectorsSetup() {
                     <tr>
                       <td colSpan={5} className="py-20 text-center">
                          <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#7A2B20] opacity-20" />
-                         <p className="text-[10px] uppercase font-black tracking-widest text-[#A88C87] mt-4">Streaming Connections...</p>
+                         <p className="text-[10px] uppercase font-black tracking-widest text-[#856B66] mt-4">Streaming Connections...</p>
                       </td>
                     </tr>
                   ) : activeConnections.length === 0 ? (
@@ -446,8 +446,8 @@ export default function ConnectorsSetup() {
                             <div className="flex flex-col">
                               <span className="font-medium text-[#3E1510]">{conn.accountName}</span>
                               <div className="flex items-center gap-1.5 mt-0.5">
-                                <Clock size={10} className="text-[#A88C87]" />
-                                <span className="text-[9px] font-bold text-[#A88C87]">
+                                <Clock size={10} className="text-[#856B66]" />
+                                <span className="text-[9px] font-bold text-[#856B66]">
                                   {conn.lastSyncedAt 
                                     ? `Last synced: ${typeof conn.lastSyncedAt === 'object' && conn.lastSyncedAt.toDate 
                                         ? conn.lastSyncedAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -651,7 +651,7 @@ export default function ConnectorsSetup() {
                           <span className={`font-black text-sm leading-tight mb-1 transition-colors ${isSelected ? 'text-brand-primary' : 'text-[#3E1510]'}`}>
                             {account.name}
                           </span>
-                          <span className="text-[10px] text-[#A88C87] font-mono tracking-tighter truncate max-w-[240px] uppercase">
+                          <span className="text-[10px] text-[#856B66] font-mono tracking-tighter truncate max-w-[240px] uppercase">
                             ID: {account.id}
                           </span>
                         </div>

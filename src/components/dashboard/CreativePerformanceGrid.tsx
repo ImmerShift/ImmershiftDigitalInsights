@@ -172,13 +172,13 @@ export const CreativePerformanceGrid: React.FC<{ business: BusinessProfile }> = 
             <div className="p-4 space-y-4">
               <div className="flex justify-between items-end">
                 <div>
-                  <p className="text-[10px] font-bold text-[#A88C87] uppercase">ROAS</p>
+                  <p className="text-[10px] font-bold text-[#856B66] uppercase">ROAS</p>
                   <p className={`text-xl font-black ${ad.roas > 4 ? 'text-[#2E6B3B]' : ad.roas < 2 ? 'text-[#7A2B20]' : 'text-[#3E1510]'}`}>
                     {ad.roas}x
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-bold text-[#A88C87] uppercase">CPA</p>
+                  <p className="text-[10px] font-bold text-[#856B66] uppercase">CPA</p>
                   <p className="text-sm font-bold text-[#3E1510]">{ad.cpa}</p>
                 </div>
               </div>
@@ -186,7 +186,7 @@ export const CreativePerformanceGrid: React.FC<{ business: BusinessProfile }> = 
               <div className="pt-4 border-t border-[#F9F7F4] flex items-center justify-between">
                  <div className="flex items-center gap-2">
                    <div className={`w-1.5 h-1.5 rounded-full ${ad.status === 'active' ? 'bg-[#2E6B3B]' : 'bg-[#7A2B20]'}`}></div>
-                   <span className="text-[10px] font-bold text-[#A88C87] uppercase tracking-tighter">{ad.status}</span>
+                   <span className="text-[10px] font-bold text-[#856B66] uppercase tracking-tighter">{ad.status}</span>
                  </div>
                  {ad.roas < 2 && (
                    <button 
@@ -237,7 +237,7 @@ export const CreativePerformanceGrid: React.FC<{ business: BusinessProfile }> = 
                 <div className="absolute bottom-6 left-6 right-6">
                    <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-xl">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-[10px] font-bold text-[#A88C87] uppercase">Visual Power Score</span>
+                        <span className="text-[10px] font-bold text-[#856B66] uppercase">Visual Power Score</span>
                         <span className="text-lg font-black text-brand-primary">{critique?.visualScore || '88'}/100</span>
                       </div>
                       <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
@@ -259,7 +259,7 @@ export const CreativePerformanceGrid: React.FC<{ business: BusinessProfile }> = 
                 {isAnalyzing ? (
                   <div className="flex-1 flex flex-col items-center justify-center space-y-4">
                     <Loader2 size={40} className="text-brand-primary animate-spin" />
-                    <p className="text-sm font-medium text-[#A88C87] animate-pulse">Running Vision Analysis...</p>
+                    <p className="text-sm font-medium text-[#856B66] animate-pulse">Running Vision Analysis...</p>
                   </div>
                 ) : (
                   <div className="space-y-8">
@@ -323,7 +323,7 @@ export const CreativePerformanceGrid: React.FC<{ business: BusinessProfile }> = 
                    <FileText className="text-brand-primary" />
                    <h2 className="text-xl font-bold font-serif text-[#3E1510]">AI Creative Brief</h2>
                 </div>
-                <button onClick={() => setBrief(null)} className="p-2 hover:bg-[#F9F7F4] rounded-full text-[#A88C87]">
+                <button onClick={() => setBrief(null)} className="p-2 hover:bg-[#F9F7F4] rounded-full text-[#856B66]">
                   <X size={20} />
                 </button>
               </div>

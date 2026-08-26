@@ -165,7 +165,7 @@ export default function DraftReportView() {
                 {isGenerating ? 'Generating' : draft.status}
               </span>
             </div>
-            <p className="text-xs text-[#A88C87] font-medium mt-0.5 flex items-center gap-1">
+            <p className="text-xs text-[#856B66] font-medium mt-0.5 flex items-center gap-1">
               <Clock size={12} />
               Last updated: {isGenerating ? '...' : draft.lastUpdated}
             </p>
@@ -197,7 +197,7 @@ export default function DraftReportView() {
                 <p className="text-sm font-bold text-brand-secondary uppercase tracking-[0.2em] mt-1">Monthly Analytics Insight</p>
               </div>
               <div className="text-right">
-                <p className="text-xs font-bold text-[#A88C87] uppercase">Reporting Period</p>
+                <p className="text-xs font-bold text-[#856B66] uppercase">Reporting Period</p>
                 <p className="text-xl font-bold text-[#3E1510]">{draft.month}</p>
               </div>
             </div>
@@ -210,7 +210,7 @@ export default function DraftReportView() {
                 <Loader2 size={32} className="text-brand-primary animate-spin flex-shrink-0" />
               </div>
               <h2 className="text-2xl font-serif font-bold text-[#3E1510] mb-2">Analyzing blended metrics...</h2>
-              <p className="text-[#A88C87] font-medium flex items-center gap-2 animate-pulse">
+              <p className="text-[#856B66] font-medium flex items-center gap-2 animate-pulse">
                 <Sparkles size={16} /> Generating executive narrative
               </p>
             </div>
@@ -238,13 +238,13 @@ export default function DraftReportView() {
                         <h2 className="text-4xl font-serif font-bold text-[#3E1510] leading-tight mb-4 pr-8 print:pr-0">
                           {section.heading}
                         </h2>
-                        <p className="text-lg text-[#A88C87] font-medium tracking-wide uppercase">
+                        <p className="text-lg text-[#856B66] font-medium tracking-wide uppercase">
                           {section.content}
                         </p>
                         <div className="absolute top-2 right-0 flex gap-2 print:hidden">
                           <button 
                             onClick={() => startEditing(section.id, section.heading)}
-                            className="opacity-0 group-hover:opacity-100 p-2 text-[#A88C87] hover:text-brand-primary bg-[#FDF8F3] rounded-lg transition-all" 
+                            className="opacity-0 group-hover:opacity-100 p-2 text-[#856B66] hover:text-brand-primary bg-[#FDF8F3] rounded-lg transition-all" 
                             title="Edit"
                           >
                             <Edit3 size={18} />
@@ -265,7 +265,7 @@ export default function DraftReportView() {
                     <div className="flex gap-2 print:hidden">
                       <button 
                         onClick={() => startEditing(section.id, section.content)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 text-[#A88C87] hover:text-brand-primary bg-[#FDF8F3] rounded-md transition-all -mb-1"
+                        className="opacity-0 group-hover:opacity-100 p-1.5 text-[#856B66] hover:text-brand-primary bg-[#FDF8F3] rounded-md transition-all -mb-1"
                       >
                         <Edit3 size={16} />
                       </button>
@@ -315,7 +315,7 @@ export default function DraftReportView() {
                 }
               }
             }}
-            className="flex-1 bg-transparent border-none outline-none resize-none px-4 py-3 text-sm text-[#3E1510] placeholder:text-[#A88C87] min-h-[52px] max-h-[120px]"
+            className="flex-1 bg-transparent border-none outline-none resize-none px-4 py-3 text-sm text-[#3E1510] placeholder:text-[#856B66] min-h-[52px] max-h-[120px]"
             placeholder="Refine this narrative with AI (e.g., 'Make it more aggressive' or 'Add data about high CPA')..."
             rows={1}
           />

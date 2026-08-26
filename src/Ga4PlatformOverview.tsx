@@ -89,13 +89,13 @@ const MOCK_FALLBACK_DATA: Ga4DashboardPayload = {
   sources: [
     { name: 'Organic Search', value: 45, fill: '#7A2B20' },
     { name: 'Direct', value: 35, fill: '#DDA77B' },
-    { name: 'Paid Social', value: 15, fill: '#A88C87' },
+    { name: 'Paid Social', value: 15, fill: '#856B66' },
     { name: 'Referral', value: 5, fill: '#EAE3D9' }
   ],
   devices: [
     { category: 'Mobile', percentage: 65, fill: '#DDA77B' },
     { category: 'Desktop', percentage: 30, fill: '#7A2B20' },
-    { category: 'Tablet', percentage: 5, fill: '#A88C87' }
+    { category: 'Tablet', percentage: 5, fill: '#856B66' }
   ],
   topPages: [
     { pagePath: '/', views: 45000, users: 38000, bounceRate: '35.2%' },
@@ -209,7 +209,7 @@ export default function Ga4PlatformOverview({ dateRange }: { dateRange?: DateRan
                 return (
                   <div key={index} className="bg-white rounded-xl border border-[#EAE3D9] p-5 shadow-sm flex flex-col justify-between h-full">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="text-[#A88C87]">
+                      <div className="text-[#856B66]">
                         <Icon size={20} />
                       </div>
                       <h3 className="text-sm font-bold text-[#5C4541] uppercase tracking-wide">{kpi.title}</h3>
@@ -241,17 +241,17 @@ export default function Ga4PlatformOverview({ dateRange }: { dateRange?: DateRan
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAE3D9" />
                     <XAxis 
                       dataKey="date" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false} 
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                       dy={10}
                     />
                     <YAxis 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                       tickFormatter={(val) => val >= 1000 ? `${val / 1000}k` : val}
                     />
                     <RechartsTooltip content={<CustomTooltip />} />
@@ -341,7 +341,7 @@ export default function Ga4PlatformOverview({ dateRange }: { dateRange?: DateRan
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                       <span className="text-3xl font-bold font-serif text-[#3E1510]">100%</span>
-                      <span className="text-xs font-semibold text-[#A88C87] uppercase tracking-widest mt-1">Total</span>
+                      <span className="text-xs font-semibold text-[#856B66] uppercase tracking-widest mt-1">Total</span>
                     </div>
                   </div>
                   
@@ -369,10 +369,10 @@ export default function Ga4PlatformOverview({ dateRange }: { dateRange?: DateRan
                 <table className="w-full text-left border-collapse min-w-[700px]">
                   <thead>
                     <tr>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Page Path</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Views</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Users</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Bounce Rate</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider">Page Path</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Views</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Users</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Bounce Rate</th>
                     </tr>
                   </thead>
                   <tbody>

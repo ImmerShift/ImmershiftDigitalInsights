@@ -46,9 +46,9 @@ export const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin 
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label htmlFor="register-name" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Full Name</label>
+            <label htmlFor="register-name" className="text-[10px] font-black uppercase text-[#856B66] tracking-widest pl-1">Full Name</label>
             <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 text-[#856B66]" size={18} />
               <input 
                 id="register-name"
                 type="text" 
@@ -57,15 +57,15 @@ export const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="CEO Name"
-                className="w-full pl-12 pr-5 py-3.5 bg-[#F9F7F4] border-none rounded-2xl focus:ring-2 focus:ring-brand-secondary text-[#3E1510] font-medium placeholder-[#A88C87]"
+                className="w-full pl-12 pr-5 py-3.5 bg-[#F9F7F4] border-none rounded-2xl focus:ring-2 focus:ring-brand-secondary text-[#3E1510] font-medium placeholder-[#856B66]"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="register-email" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Agency Email</label>
+            <label htmlFor="register-email" className="text-[10px] font-black uppercase text-[#856B66] tracking-widest pl-1">Agency Email</label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#856B66]" size={18} />
               <input 
                 id="register-email"
                 type="email" 
@@ -74,15 +74,15 @@ export const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="growth@agency.com"
-                className="w-full pl-12 pr-5 py-3.5 bg-[#F9F7F4] border-none rounded-2xl focus:ring-2 focus:ring-brand-secondary text-[#3E1510] font-medium placeholder-[#A88C87]"
+                className="w-full pl-12 pr-5 py-3.5 bg-[#F9F7F4] border-none rounded-2xl focus:ring-2 focus:ring-brand-secondary text-[#3E1510] font-medium placeholder-[#856B66]"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="register-password" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Password</label>
+            <label htmlFor="register-password" className="text-[10px] font-black uppercase text-[#856B66] tracking-widest pl-1">Password</label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#856B66]" size={18} />
               <input 
                 id="register-password"
                 type="password" 
@@ -121,12 +121,12 @@ export const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin 
 
         <div className="mt-8 pt-8 border-t border-[#F9F7F4] flex items-center justify-center gap-6">
            <div className="flex flex-col items-center gap-1">
-              <ShieldCheck size={16} className="text-[#A88C87]" />
-              <span className="text-[8px] font-black uppercase text-[#A88C87]">SOC2 Secure</span>
+              <ShieldCheck size={16} className="text-[#856B66]" />
+              <span className="text-[8px] font-black uppercase text-[#856B66]">SOC2 Secure</span>
            </div>
            <div className="flex flex-col items-center gap-1">
-              <CheckCircle2 size={16} className="text-[#A88C87]" />
-              <span className="text-[8px] font-black uppercase text-[#A88C87]">Verified API</span>
+              <CheckCircle2 size={16} className="text-[#856B66]" />
+              <span className="text-[8px] font-black uppercase text-[#856B66]">Verified API</span>
            </div>
         </div>
       </motion.div>

@@ -88,7 +88,7 @@ const MOCK_FALLBACK_DATA_EMAIL: EmailDashboardPayload = {
     { flowName: 'Abandoned Booking (TableCheck)', revenue: 65, fill: '#7A2B20' },
     { flowName: 'Welcome Series - New Subscribers', revenue: 35, fill: '#DDA77B' },
     { flowName: 'Post-Visit VIP Upsell', revenue: 18, fill: '#2E6B3B' },
-    { flowName: 'Birthday Month Offer', revenue: 7.4, fill: '#A88C87' }
+    { flowName: 'Birthday Month Offer', revenue: 7.4, fill: '#856B66' }
   ],
   audienceHealth: [
     { name: 'Highly Engaged', value: 45, fill: '#2E6B3B' },
@@ -223,7 +223,7 @@ export default function EmailPlatformOverview({ dateRange }: { dateRange?: DateR
                 return (
                   <div key={index} className="bg-white rounded-xl border border-[#EAE3D9] p-5 shadow-sm flex flex-col justify-between h-full">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="text-[#A88C87]">
+                      <div className="text-[#856B66]">
                         <Icon size={20} />
                       </div>
                       <h3 className="text-sm font-bold text-[#5C4541] uppercase tracking-wide">{kpi.title}</h3>
@@ -255,27 +255,27 @@ export default function EmailPlatformOverview({ dateRange }: { dateRange?: DateR
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAE3D9" />
                     <XAxis 
                       dataKey="date" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false} 
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                       dy={10}
                     />
                     <YAxis 
                       yAxisId="left" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                       tickFormatter={(val) => `${val}%`}
                     />
                     <YAxis 
                       yAxisId="right" 
                       orientation="right" 
-                      stroke="#A88C87" 
+                      stroke="#856B66" 
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 12, fill: '#A88C87' }}
+                      tick={{ fontSize: 12, fill: '#856B66' }}
                       tickFormatter={(val) => `${val}%`}
                     />
                     <RechartsTooltip content={<CustomTooltip />} />
@@ -367,7 +367,7 @@ export default function EmailPlatformOverview({ dateRange }: { dateRange?: DateR
                     </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                       <span className="text-3xl font-bold font-serif text-[#3E1510]">100%</span>
-                      <span className="text-xs font-semibold text-[#A88C87] uppercase tracking-widest mt-1">Audience</span>
+                      <span className="text-xs font-semibold text-[#856B66] uppercase tracking-widest mt-1">Audience</span>
                     </div>
                   </div>
                   
@@ -395,12 +395,12 @@ export default function EmailPlatformOverview({ dateRange }: { dateRange?: DateR
                 <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead>
                     <tr>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Campaign Name</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider">Provider</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Sent</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Open Rate</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Click Rate</th>
-                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#A88C87] uppercase tracking-wider text-right">Revenue</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider">Campaign Name</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider">Provider</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Sent</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Open Rate</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Click Rate</th>
+                      <th scope="col" className="bg-[#FDF8F3] px-6 py-3 text-xs font-bold text-[#856B66] uppercase tracking-wider text-right">Revenue</th>
                     </tr>
                   </thead>
                   <tbody>

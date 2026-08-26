@@ -39,7 +39,7 @@ export const DataHealthMonitor: React.FC<DataHealthMonitorProps> = ({ currentLiv
           </div>
           <div>
             <h2 className="text-xl font-bold font-serif text-[#3E1510]">Data Infrastructure Health</h2>
-            <p className="text-xs text-[#A88C87] font-medium">Monitoring 5 active data pipes</p>
+            <p className="text-xs text-[#856B66] font-medium">Monitoring 5 active data pipes</p>
           </div>
         </div>
         <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#EAE3D9] rounded-lg text-xs font-bold text-[#5C4541] hover:bg-[#F9F7F4] transition-colors">
@@ -51,10 +51,10 @@ export const DataHealthMonitor: React.FC<DataHealthMonitorProps> = ({ currentLiv
         <table className="w-full">
           <thead>
             <tr className="text-left border-b border-[#F9F7F4]">
-              <th className="pb-4 text-[10px] font-black text-[#A88C87] uppercase tracking-wider">Source</th>
-              <th className="pb-4 text-[10px] font-black text-[#A88C87] uppercase tracking-wider">Status</th>
-              <th className="pb-4 text-[10px] font-black text-[#A88C87] uppercase tracking-wider">Last Sync</th>
-              <th className="pb-4 text-[10px] font-black text-[#A88C87] uppercase tracking-wider">Data Mode</th>
+              <th className="pb-4 text-[10px] font-black text-[#856B66] uppercase tracking-wider">Source</th>
+              <th className="pb-4 text-[10px] font-black text-[#856B66] uppercase tracking-wider">Status</th>
+              <th className="pb-4 text-[10px] font-black text-[#856B66] uppercase tracking-wider">Last Sync</th>
+              <th className="pb-4 text-[10px] font-black text-[#856B66] uppercase tracking-wider">Data Mode</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#F9F7F4]">
@@ -86,7 +86,7 @@ export const DataHealthMonitor: React.FC<DataHealthMonitorProps> = ({ currentLiv
                 </td>
                 <td className="py-4">
                   <div className="flex items-center gap-2 text-xs text-[#5C4541]">
-                    <Clock size={12} className="text-[#A88C87]" />
+                    <Clock size={12} className="text-[#856B66]" />
                     {pipe.lastSynced}
                   </div>
                 </td>
@@ -108,7 +108,7 @@ export const DataHealthMonitor: React.FC<DataHealthMonitorProps> = ({ currentLiv
       </div>
       
       <div className="px-6 py-4 bg-[#F9F7F4] border-t border-[#EAE3D9]">
-        <div className="flex items-center gap-2 text-[#A88C87]">
+        <div className="flex items-center gap-2 text-[#856B66]">
           <ShieldCheck size={14} />
           <p className="text-[10px] font-medium italic">Secure SSL integration with 256-bit encryption verified for all connected nodes.</p>
         </div>

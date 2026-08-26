@@ -47,7 +47,7 @@ export const BudgetOptimizer: React.FC<BudgetOptimizerProps> = ({ business, chan
           </div>
           <div>
             <h2 className="text-xl font-bold font-serif text-[#3E1510]">Strategic Budget Optimizer</h2>
-            <p className="text-xs text-[#A88C87] font-medium">AI-driven capital efficiency</p>
+            <p className="text-xs text-[#856B66] font-medium">AI-driven capital efficiency</p>
           </div>
         </div>
         {isLoading && <Sparkles size={20} className="text-brand-secondary animate-pulse" />}
@@ -79,7 +79,7 @@ export const BudgetOptimizer: React.FC<BudgetOptimizerProps> = ({ business, chan
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-[#A88C87]">{rec.source}</span>
+                      <span className="text-xs font-bold text-[#856B66]">{rec.source}</span>
                       <ArrowRight size={14} className="text-brand-secondary" />
                       <span className="text-xs font-bold text-[#3E1510]">{rec.target}</span>
                     </div>
@@ -91,7 +91,7 @@ export const BudgetOptimizer: React.FC<BudgetOptimizerProps> = ({ business, chan
             </div>
           ) : (
             <div className="p-6 text-center bg-[#F9F7F4] rounded-xl border border-dashed border-[#EAE3D9]">
-                <p className="text-sm text-[#A88C87]">No reallocations needed based on current efficiency.</p>
+                <p className="text-sm text-[#856B66]">No reallocations needed based on current efficiency.</p>
             </div>
           )}
         </div>
@@ -118,7 +118,7 @@ export const BudgetOptimizer: React.FC<BudgetOptimizerProps> = ({ business, chan
                 onChange={(e) => setSimulatorValue(parseInt(e.target.value))}
                 className="w-full h-2 bg-[#EAE3D9] rounded-lg appearance-none cursor-pointer accent-brand-primary"
               />
-              <div className="flex justify-between mt-2 text-[10px] font-bold text-[#A88C87] uppercase tracking-tighter">
+              <div className="flex justify-between mt-2 text-[10px] font-bold text-[#856B66] uppercase tracking-tighter">
                 <span>Cut Spend</span>
                 <span>Maintain</span>
                 <span>Aggressive Expansion</span>
@@ -129,10 +129,10 @@ export const BudgetOptimizer: React.FC<BudgetOptimizerProps> = ({ business, chan
                <div className="absolute top-0 right-0 p-3">
                   <Info size={14} className="text-[#EAE3D9]" />
                </div>
-               <p className="text-xs font-bold text-[#A88C87] uppercase mb-1">Projected Revenue Lift</p>
+               <p className="text-xs font-bold text-[#856B66] uppercase mb-1">Projected Revenue Lift</p>
                <div className="flex items-baseline gap-2">
                  <span className="text-3xl font-black text-[#2E6B3B]">{projectedLift}</span>
-                 <span className="text-xs font-medium text-[#A88C87]">vs current pacing</span>
+                 <span className="text-xs font-medium text-[#856B66]">vs current pacing</span>
                </div>
                <div className="mt-4 flex items-center gap-2">
                  <div className="w-2 h-2 rounded-full bg-[#2E6B3B] animate-pulse"></div>

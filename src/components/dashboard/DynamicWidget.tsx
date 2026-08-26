@@ -35,12 +35,12 @@ export const DynamicWidget: React.FC<DynamicWidgetProps> = ({ schema }) => {
               dataKey="name" 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fontSize: 10, fill: '#A88C87' }} 
+              tick={{ fontSize: 10, fill: '#856B66' }} 
             />
             <YAxis 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fontSize: 10, fill: '#A88C87' }} 
+              tick={{ fontSize: 10, fill: '#856B66' }} 
             />
             <Tooltip 
               contentStyle={{ borderRadius: '12px', border: '1px solid #EAE3D9', fontSize: '12px' }}
@@ -63,12 +63,12 @@ export const DynamicWidget: React.FC<DynamicWidgetProps> = ({ schema }) => {
               dataKey="name" 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fontSize: 10, fill: '#A88C87' }} 
+              tick={{ fontSize: 10, fill: '#856B66' }} 
             />
             <YAxis 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fontSize: 10, fill: '#A88C87' }} 
+              tick={{ fontSize: 10, fill: '#856B66' }} 
             />
             <Tooltip 
                contentStyle={{ borderRadius: '12px', border: '1px solid #EAE3D9', fontSize: '12px' }}
@@ -106,7 +106,7 @@ export const DynamicWidget: React.FC<DynamicWidgetProps> = ({ schema }) => {
       case 'kpi':
         return (
           <div className="h-full flex flex-col justify-center items-center text-center">
-             <p className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest mb-2">{dataKeys[0] || 'Metric'}</p>
+             <p className="text-[10px] font-black uppercase text-[#856B66] tracking-widest mb-2">{dataKeys[0] || 'Metric'}</p>
              <p className="text-4xl font-serif font-black text-[#3E1510]">{data[0]?.value || '0'}</p>
              {data[0]?.subtext && (
                <p className="text-xs text-[#5C4541] mt-2 font-medium">{data[0].subtext}</p>
@@ -114,7 +114,7 @@ export const DynamicWidget: React.FC<DynamicWidgetProps> = ({ schema }) => {
           </div>
         );
       default:
-        return <div className="h-full flex items-center justify-center text-[#A88C87]">Unsupported Widget Type</div>;
+        return <div className="h-full flex items-center justify-center text-[#856B66]">Unsupported Widget Type</div>;
     }
   };
 

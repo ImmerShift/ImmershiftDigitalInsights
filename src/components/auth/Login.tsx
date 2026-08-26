@@ -46,9 +46,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister, onGoo
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <label htmlFor="login-email" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest pl-1">Email Address</label>
+            <label htmlFor="login-email" className="text-[10px] font-black uppercase text-[#856B66] tracking-widest pl-1">Email Address</label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#856B66]" size={18} />
               <input 
                 id="login-email"
                 type="email" 
@@ -57,18 +57,18 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister, onGoo
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="CEO@youragency.com"
-                className="w-full pl-12 pr-5 py-4 bg-[#F9F7F4] border-none rounded-2xl focus:ring-2 focus:ring-brand-primary text-[#3E1510] font-medium placeholder-[#A88C87]"
+                className="w-full pl-12 pr-5 py-4 bg-[#F9F7F4] border-none rounded-2xl focus:ring-2 focus:ring-brand-primary text-[#3E1510] font-medium placeholder-[#856B66]"
               />
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between items-center px-1">
-               <label htmlFor="login-password" className="text-[10px] font-black uppercase text-[#A88C87] tracking-widest">Password</label>
+               <label htmlFor="login-password" className="text-[10px] font-black uppercase text-[#856B66] tracking-widest">Password</label>
                <button type="button" disabled aria-disabled="true" title="Coming soon" className="text-[10px] font-black uppercase text-brand-primary opacity-50 cursor-not-allowed">Forgot?</button>
             </div>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A88C87]" size={18} />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#856B66]" size={18} />
               <input 
                 id="login-password"
                 type="password" 
@@ -103,7 +103,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister, onGoo
               <div className="w-full border-t border-[#EAE3D9]"></div>
            </div>
            <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
-              <span className="bg-white px-4 text-[#A88C87]">Or Continue With</span>
+              <span className="bg-white px-4 text-[#856B66]">Or Continue With</span>
            </div>
         </div>
 

@@ -18,10 +18,10 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({ business, report }) 
       <div className="bg-[#F9F7F4] border-b border-[#EAE3D9] p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-[#EAE3D9] flex items-center justify-center">
-            <Mail size={16} className="text-[#A88C87]" />
+            <Mail size={16} className="text-[#856B66]" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-[#A88C87] uppercase">Subject</p>
+            <p className="text-[10px] font-bold text-[#856B66] uppercase">Subject</p>
             <p className="text-sm font-bold text-[#3E1510]">{report.month} Performance Executive Summary - {business.name}</p>
           </div>
         </div>
@@ -36,7 +36,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({ business, report }) 
         <div className="flex justify-between items-center border-b-2 border-brand-primary pb-6 mb-8">
           <h1 className="text-2xl font-serif font-extrabold text-brand-primary">{business.name}</h1>
           <div className="text-right">
-            <p className="text-[10px] font-bold text-[#A88C87] uppercase">Prepared for Executive Team</p>
+            <p className="text-[10px] font-bold text-[#856B66] uppercase">Prepared for Executive Team</p>
             <p className="text-sm font-bold text-[#3E1510]">{report.month} Summary</p>
           </div>
         </div>
@@ -73,7 +73,7 @@ export const EmailPreview: React.FC<EmailPreviewProps> = ({ business, report }) 
 
         {/* Footer */}
         <div className="mt-12 pt-8 border-t border-[#EAE3D9] text-center">
-          <p className="text-[10px] text-[#A88C87] font-medium uppercase tracking-widest leading-loose">
+          <p className="text-[10px] text-[#856B66] font-medium uppercase tracking-widest leading-loose">
             Digitally Powered by Insights Pro AI<br />
             Strategy • Performance • Scale
           </p>

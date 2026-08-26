@@ -78,7 +78,7 @@ export const PacingChart: React.FC<PacingChartProps> = ({
       
       <div className="h-[350px] w-full" role="img" aria-label={`Pacing chart showing ${primaryLabel} vs ${secondaryLabel}`}>
         {(!data || data.length === 0) ? (
-          <div className="h-[300px] flex items-center justify-center text-[#A88C87] font-medium border-2 border-dashed border-[#EAE3D9] rounded-2xl">
+          <div className="h-[300px] flex items-center justify-center text-[#856B66] font-medium border-2 border-dashed border-[#EAE3D9] rounded-2xl">
             No data available for the selected date range.
           </div>
         ) : (
@@ -107,27 +107,27 @@ export const PacingChart: React.FC<PacingChartProps> = ({
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAE3D9" />
             <XAxis 
               dataKey="date" 
-              stroke="#A88C87" 
+              stroke="#856B66" 
               axisLine={false} 
               tickLine={false}
-              tick={{ fontSize: 12, fill: '#A88C87', fontWeight: 500 }}
+              tick={{ fontSize: 12, fill: '#856B66', fontWeight: 500 }}
               dy={10}
             />
             <YAxis 
               yAxisId="left" 
-              stroke="#A88C87" 
+              stroke="#856B66" 
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: '#A88C87', fontWeight: 500 }}
+              tick={{ fontSize: 12, fill: '#856B66', fontWeight: 500 }}
               tickFormatter={formatPrimary || ((val) => val)}
             />
             <YAxis 
               yAxisId="right" 
               orientation="right" 
-              stroke="#A88C87" 
+              stroke="#856B66" 
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: '#A88C87', fontWeight: 500 }}
+              tick={{ fontSize: 12, fill: '#856B66', fontWeight: 500 }}
               tickFormatter={formatSecondary || ((val) => val)}
             />
             <Tooltip 
