@@ -9,33 +9,40 @@ async function startServer() {
 
   app.use(express.json());
 
-  // Security: Backend Proxy for Gemini API
-  // This keeps the VITE_GEMINI_API_KEY safe on the server
-  app.post("/api/generate-narrative", async (req, res) => {
-    const { prompt, business, month } = req.body;
-    const apiKey = process.env.GEMINI_API_KEY;
+  // Security: backend proxy for the Gemini API. The key never leaves the server.
+  // The client posts the same {contents, generationConfig} body it used to send
+  // to Google directly, so call sites keep their shape.
+  const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
 
+  app.post("/api/gemini", async (req, res) => {
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: "Server API Key not configured" });
+      return res.status(500).json({ error: "Server API key not configured" });
+    }
+
+    const { contents, generationConfig } = req.body ?? {};
+    if (!Array.isArray(contents) || contents.length === 0) {
+      return res.status(400).json({ error: "Missing 'contents' in request body" });
     }
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: 0.7,
-              responseMimeType: "application/json",
-            },
-          }),
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
+          body: JSON.stringify({ contents, generationConfig }),
         }
       );
 
       const data = await response.json();
+      if (!response.ok) {
+        console.error("Gemini API error:", response.status, data);
+        return res.status(response.status).json({ error: "Gemini request failed" });
+      }
       res.json(data);
     } catch (error) {
       console.error("Proxy Error:", error);
@@ -80,17 +87,27 @@ async function startServer() {
   app.get("/api/auth/:platform/callback", (req, res) => {
     const { platform } = req.params;
     const { code } = req.query;
-    
-    // Sends a message back to the opener window (ConnectorsSetup)
-    // The frontend then POSTs the code to /exchange-and-accounts to finish the flow securely
-    res.send(`
+
+    // JSON.stringify + <\/ escaping keeps attacker-controlled query params from
+    // breaking out of the script tag. Never interpolate req.query raw into HTML.
+    const payload = JSON.stringify({
+      type: "OAUTH_SUCCESS",
+      platform: String(platform),
+      code: String(code ?? ""),
+    }).replace(/</g, "\\u003c");
+
+    // Target the exact origin, not '*': the auth code must not be readable by
+    // any other page that happens to have opened this popup.
+    const selfOrigin = JSON.stringify(
+      process.env.APP_URL || `http://localhost:${PORT}`
+    ).replace(/</g, "\\u003c");
+
+    res.set("Content-Type", "text/html; charset=utf-8");
+    res.send(`<!doctype html>
       <html>
         <body>
           <script>
-            window.opener.postMessage(
-              { type: 'OAUTH_SUCCESS', platform: '${platform}', code: '${code}' },
-              '*'
-            );
+            window.opener && window.opener.postMessage(${payload}, ${selfOrigin});
             window.close();
           </script>
           <p>Authentication complete. Closing window...</p>

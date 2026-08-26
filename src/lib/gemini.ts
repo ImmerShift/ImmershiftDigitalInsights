@@ -40,7 +40,7 @@ export async function generateWidgetSchema(
   language: 'en' | 'id' = 'en',
   apiKey?: string
 ): Promise<WidgetSchema | null> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) return null;
 
   const prompt = `
@@ -67,7 +67,7 @@ Return valid JSON:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -105,7 +105,7 @@ export async function generateMonthlyNarrative(
   data: DashboardContextData, 
   apiKey?: string
 ): Promise<ReportDraft> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   
   if (!key) {
     console.error('Gemini API key is missing.');
@@ -153,7 +153,7 @@ Guidelines:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -207,7 +207,7 @@ export async function analyzeDashboardQuery(
   language: 'en' | 'id' = 'en',
   apiKey?: string
 ): Promise<string> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   
   if (!key) {
     return language === 'id' ? "Analis AI sedang offline." : "AI Analyst is currently offline. Please configure your API key.";
@@ -234,7 +234,7 @@ Instructions:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -266,7 +266,7 @@ export async function detectAnomalies(
   dashboardContext: any,
   apiKey?: string
 ): Promise<string[]> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) return [];
 
   const prompt = `
@@ -281,7 +281,7 @@ Format: ["Alert 1", "Alert 2"]
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -321,7 +321,7 @@ export async function getPredictiveForecast(
   currentMetrics: any,
   apiKey?: string
 ): Promise<PredictiveForecast> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) {
     return {
       projectedRevenue: "N/A",
@@ -352,7 +352,7 @@ Return valid JSON:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -391,7 +391,7 @@ export async function suggestBudgetReallocation(
   channelData: any[],
   apiKey?: string
 ): Promise<BudgetReallocation[]> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) return [];
 
   const prompt = `
@@ -408,7 +408,7 @@ Return valid JSON array of objects:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -433,7 +433,7 @@ export async function getHolisticFunnelInsight(
   dashboardContext: any,
   apiKey?: string
 ): Promise<string> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) return "Holistic analysis offline.";
 
   const prompt = `
@@ -445,7 +445,7 @@ Provide a concise "Holistic Funnel Insight" (max 3 sentences) that explains the 
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -471,7 +471,7 @@ export async function analyzeCreative(
   metrics: { roas: number; ctr: number; spend: string },
   apiKey?: string
 ): Promise<{ visualScore: number; designCritique: string; suggestedImprovements: string[] }> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) {
     return {
       visualScore: 0,
@@ -501,7 +501,7 @@ Image URL: ${imageUrl}
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -531,7 +531,7 @@ export async function generateCreativeBrief(
   topPerformers: any[],
   apiKey?: string
 ): Promise<string> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) return "Brief generation offline.";
 
   const prompt = `
@@ -550,7 +550,7 @@ Format as clean Markdown.
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -575,7 +575,7 @@ export async function analyzeMessageMatch(
   landingPageUrl: string,
   apiKey?: string
 ): Promise<{ score: number; critique: string; suggestions: string[] }> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) {
     return {
       score: 0,
@@ -601,7 +601,7 @@ Return valid JSON:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -631,7 +631,7 @@ export async function reconcileAttribution(
   crmData: any,
   apiKey?: string
 ): Promise<{ truthScore: number; recommendation: string; modelFit: string }> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) {
     return { truthScore: 0, recommendation: "N/A", modelFit: "API Key missing" };
   }
@@ -652,7 +652,7 @@ Return valid JSON:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -676,7 +676,7 @@ export async function analyzeLeadQuality(
   leadNotes: string[],
   apiKey?: string
 ): Promise<{ score: number; categorization: string; insights: string }> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) {
     return { score: 0, categorization: "Low Intent", insights: "API Key missing" };
   }
@@ -695,7 +695,7 @@ Return valid JSON:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -719,7 +719,7 @@ export async function predictLTV(
   cohortData: any,
   apiKey?: string
 ): Promise<{ ltv12m: string; retentionRate: string; confidence: number }> {
-  const key = apiKey || (typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined);
+  const key = apiKey ?? 'server-proxied'; // real key lives server-side, see /api/gemini
   if (!key) {
     return { ltv12m: "N/A", retentionRate: "0%", confidence: 0 };
   }
@@ -738,7 +738,7 @@ Return valid JSON:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `/api/gemini`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

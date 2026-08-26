@@ -7,9 +7,9 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
     plugins: [react(), tailwindcss()],
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-    },
+    // NOTE: never `define` a secret here. Anything defined is substituted into
+    // the shipped bundle and is readable by every visitor. The Gemini key stays
+    // on the server and is reached through the /api/gemini proxy.
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
