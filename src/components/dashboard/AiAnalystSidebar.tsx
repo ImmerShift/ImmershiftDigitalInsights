@@ -99,7 +99,7 @@ export const AiAnalystSidebar: React.FC<AiAnalystSidebarProps> = ({
             </div>
             <button 
               onClick={onClose}
-              className="p-2 hover:bg-[#EAE3D9] rounded-lg transition-colors text-[#A88C87]"
+              className="p-2 hover:bg-[#EAE3D9] rounded-lg transition-colors text-[#856B66]"
             >
               <X size={20} />
             </button>
@@ -146,9 +146,9 @@ export const AiAnalystSidebar: React.FC<AiAnalystSidebarProps> = ({
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-[#F9F7F4] border border-[#EAE3D9] rounded-2xl px-5 py-3 flex gap-2 items-center">
-                  <div className="w-1.5 h-1.5 bg-[#A88C87] rounded-full animate-bounce"></div>
-                  <div className="w-1.5 h-1.5 bg-[#A88C87] rounded-full animate-bounce [animation-delay:0.2s]"></div>
-                  <div className="w-1.5 h-1.5 bg-[#A88C87] rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                  <div className="w-1.5 h-1.5 bg-[#856B66] rounded-full animate-bounce"></div>
+                  <div className="w-1.5 h-1.5 bg-[#856B66] rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                  <div className="w-1.5 h-1.5 bg-[#856B66] rounded-full animate-bounce [animation-delay:0.4s]"></div>
                 </div>
               </div>
             )}
